@@ -9,8 +9,6 @@ import {
   CylinderCollider,
   CuboidCollider,
   BallCollider,
-  type RigidBodyOptions,
-  RigidBodyProps,
 } from "@react-three/rapier";
 import { easing } from "maath";
 import {
@@ -21,6 +19,8 @@ import {
 } from "@react-three/postprocessing";
 import { proxy, useSnapshot } from "valtio";
 import { clamp } from "lodash-es";
+import { gameAtom, setGameAtom, useGameAtom } from "@/atoms/game.atom";
+import { useAtom } from "jotai";
 
 // Define types
 type GameState = {
@@ -90,6 +90,7 @@ const Paddle = memo(({ position }: PaddleProps) => {
   const api = useRef<React.ComponentRef<typeof RigidBody>>(null);
   const model = useRef<THREE.Group>(null);
   const { count } = useSnapshot(state);
+  const [game, setGame] = useGameAtom();
   const { nodes, materials } = useGLTF(
     "/pingpong.glb",
   ) as unknown as GLTFResult;
@@ -98,12 +99,14 @@ const Paddle = memo(({ position }: PaddleProps) => {
 
   const contactForce = useCallback(
     (payload: { totalForceMagnitude: number }) => {
-      state.api.pong(payload.totalForceMagnitude / 100);
+      if (payload.totalForceMagnitude / 100 > 10) {
+        setGame((prev) => ({ ...prev, count: prev.count + 1 }));
+      }
       if (model.current) {
         model.current.position.y = -payload.totalForceMagnitude / 10000;
       }
     },
-    [],
+    [setGame],
   );
 
   useFrame((state, delta) => {
@@ -166,9 +169,9 @@ const Paddle = memo(({ position }: PaddleProps) => {
           position={[0, 1, 0]}
           fontSize={10}
         >
-          {count}
+          {game.count}
         </Text>
-        {nodes.Bone &&
+        {/* {nodes.Bone &&
           nodes.Bone003 &&
           nodes.Bone006 &&
           nodes.Bone010 &&
@@ -187,7 +190,7 @@ const Paddle = memo(({ position }: PaddleProps) => {
                 skeleton={(nodes.arm as THREE.SkinnedMesh).skeleton}
               />
             </group>
-          )}
+          )} */}
         {nodes.mesh &&
           nodes.mesh_1 &&
           nodes.mesh_2 &&
@@ -290,7 +293,7 @@ const Ball = memo(({ position = [0, 5, 0] }: BallProps) => {
 
 // Background component
 const Background = memo(() => {
-  const texture = useTexture("/bg.jpg");
+  const texture = useTexture("/bg1.jpg");
 
   return (
     <mesh rotation={[0, Math.PI / 1.25, 0]} scale={100}>
@@ -332,7 +335,7 @@ const Game = () => {
         shadow-bias={-0.0001}
       />
       <Physics gravity={[0, -40, 0]} timeStep="vary">
-        <Ball position={[0, 5, 0]} />
+        {/* <Ball position={[0, 5, 0]} /> */}
         <Paddle position={[0, 0, 0]} />
       </Physics>
       <Effects />
@@ -342,3 +345,19 @@ const Game = () => {
 };
 
 export default Game;
+
+// Game management functions
+export const startGame = () => {
+  console.log("Game started!");
+  // You could initialize state here
+  const setGame = setGameAtom();
+  setGame((prev) => ({ ...prev, count: 0 }));
+
+  // You might want to reset ball position or other initialization
+};
+
+export const endGame = () => {
+  console.log("Game ended!");
+  // You could do game end processing here
+  // Perhaps show a game over message or save high scores
+};
