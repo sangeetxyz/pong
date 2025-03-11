@@ -1,5 +1,5 @@
 {
-  "name": "jwt-wallet-auth",
+  "name": "pong",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -69,5 +69,5 @@
   "ct3aMetadata": {
     "initVersion": "7.38.1"
   },
-  "packageManager": "pnpm@9.15.1"
+  "packageManager": "bun@1.2.0"
 }
