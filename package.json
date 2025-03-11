@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "@auth/drizzle-adapter": "^1.7.2",
+    "@radix-ui/react-dialog": "^1.1.6",
     "@radix-ui/react-slot": "^1.1.1",
     "@reown/appkit": "^1.6.4",
     "@reown/appkit-adapter-wagmi": "^1.6.4",
@@ -46,7 +47,7 @@
     "tailwind-merge": "^2.6.0",
     "tailwindcss-animate": "^1.0.7",
     "viem": "^2.22.9",
-    "wagmi": "^2.14.8",
+    "wagmi": "^2.14.13",
     "zod": "^3.23.3"
   },
   "devDependencies": {

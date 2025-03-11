@@ -8,5 +8,5 @@ export default {
   dbCredentials: {
     url: env.DATABASE_URL,
   },
-  tablesFilter: ["jwt-wallet-auth_*"],
+  tablesFilter: ["pong_*"],
 } satisfies Config;

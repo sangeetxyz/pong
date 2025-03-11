@@ -1,11 +1,11 @@
 {
-  "id": "60133258-2305-4e0a-b0dd-d81af4d2dff0",
+  "id": "302c067f-c2ff-4019-a58e-5e8611830823",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
-    "public.jwt-wallet-auth_account": {
-      "name": "jwt-wallet-auth_account",
+    "public.pong_account": {
+      "name": "pong_account",
       "schema": "",
       "columns": {
         "user_id": {
@@ -93,10 +93,10 @@
         }
       },
       "foreignKeys": {
-        "jwt-wallet-auth_account_user_id_jwt-wallet-auth_user_id_fk": {
-          "name": "jwt-wallet-auth_account_user_id_jwt-wallet-auth_user_id_fk",
-          "tableFrom": "jwt-wallet-auth_account",
-          "tableTo": "jwt-wallet-auth_user",
+        "pong_account_user_id_pong_user_id_fk": {
+          "name": "pong_account_user_id_pong_user_id_fk",
+          "tableFrom": "pong_account",
+          "tableTo": "pong_user",
           "columnsFrom": [
             "user_id"
           ],
@@ -108,8 +108,8 @@
         }
       },
       "compositePrimaryKeys": {
-        "jwt-wallet-auth_account_provider_provider_account_id_pk": {
-          "name": "jwt-wallet-auth_account_provider_provider_account_id_pk",
+        "pong_account_provider_provider_account_id_pk": {
+          "name": "pong_account_provider_provider_account_id_pk",
           "columns": [
             "provider",
             "provider_account_id"
@@ -118,8 +118,8 @@
       },
       "uniqueConstraints": {}
     },
-    "public.jwt-wallet-auth_post": {
-      "name": "jwt-wallet-auth_post",
+    "public.pong_post": {
+      "name": "pong_post",
       "schema": "",
       "columns": {
         "id": {
@@ -129,7 +129,7 @@
           "notNull": true,
           "identity": {
             "type": "byDefault",
-            "name": "jwt-wallet-auth_post_id_seq",
+            "name": "pong_post_id_seq",
             "schema": "public",
             "increment": "1",
             "startWith": "1",
@@ -198,10 +198,10 @@
         }
       },
       "foreignKeys": {
-        "jwt-wallet-auth_post_created_by_jwt-wallet-auth_user_id_fk": {
-          "name": "jwt-wallet-auth_post_created_by_jwt-wallet-auth_user_id_fk",
-          "tableFrom": "jwt-wallet-auth_post",
-          "tableTo": "jwt-wallet-auth_user",
+        "pong_post_created_by_pong_user_id_fk": {
+          "name": "pong_post_created_by_pong_user_id_fk",
+          "tableFrom": "pong_post",
+          "tableTo": "pong_user",
           "columnsFrom": [
             "created_by"
           ],
@@ -215,8 +215,8 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "public.jwt-wallet-auth_session": {
-      "name": "jwt-wallet-auth_session",
+    "public.pong_session": {
+      "name": "pong_session",
       "schema": "",
       "columns": {
         "session_token": {
@@ -256,10 +256,10 @@
         }
       },
       "foreignKeys": {
-        "jwt-wallet-auth_session_user_id_jwt-wallet-auth_user_id_fk": {
-          "name": "jwt-wallet-auth_session_user_id_jwt-wallet-auth_user_id_fk",
-          "tableFrom": "jwt-wallet-auth_session",
-          "tableTo": "jwt-wallet-auth_user",
+        "pong_session_user_id_pong_user_id_fk": {
+          "name": "pong_session_user_id_pong_user_id_fk",
+          "tableFrom": "pong_session",
+          "tableTo": "pong_user",
           "columnsFrom": [
             "user_id"
           ],
@@ -273,8 +273,8 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "public.jwt-wallet-auth_user": {
-      "name": "jwt-wallet-auth_user",
+    "public.pong_user": {
+      "name": "pong_user",
       "schema": "",
       "columns": {
         "id": {
@@ -314,8 +314,8 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "public.jwt-wallet-auth_verification_token": {
-      "name": "jwt-wallet-auth_verification_token",
+    "public.pong_verification_token": {
+      "name": "pong_verification_token",
       "schema": "",
       "columns": {
         "identifier": {
@@ -340,8 +340,8 @@
       "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {
-        "jwt-wallet-auth_verification_token_identifier_token_pk": {
-          "name": "jwt-wallet-auth_verification_token_identifier_token_pk",
+        "pong_verification_token_identifier_token_pk": {
+          "name": "pong_verification_token_identifier_token_pk",
           "columns": [
             "identifier",
             "token"

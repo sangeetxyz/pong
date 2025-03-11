@@ -7,6 +7,7 @@ import { mainnet, arbitrum } from "@reown/appkit/networks";
 import React, { type ReactNode } from "react";
 import { cookieToInitialState, WagmiProvider, type Config } from "wagmi";
 import { TRPCReactProvider } from "@/trpc/react";
+import { SessionProvider } from "next-auth/react";
 
 if (!projectId) {
   throw new Error("Project ID is not defined");
@@ -39,14 +40,16 @@ function ReownProvider({
   const initialState = cookieToInitialState(wagmiAdapter.wagmiConfig, cookies);
 
   return (
-    <TRPCReactProvider>
-      <WagmiProvider
-        config={wagmiAdapter.wagmiConfig}
-        initialState={initialState}
-      >
-        {children}
-      </WagmiProvider>
-    </TRPCReactProvider>
+    <SessionProvider>
+      <TRPCReactProvider>
+        <WagmiProvider
+          config={wagmiAdapter.wagmiConfig}
+          initialState={initialState}
+        >
+          {children}
+        </WagmiProvider>
+      </TRPCReactProvider>
+    </SessionProvider>
   );
 }
 

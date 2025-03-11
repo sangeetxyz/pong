@@ -2,11 +2,11 @@
 
 import { signIn, signOut } from "@/server/auth";
 import { isRedirectError } from "next/dist/client/components/redirect-error";
-import { redirect } from "next/navigation";
+import { Address } from "viem";
 
 interface Props {
-  address: `0x${string}`;
-  signature: `0x${string}`;
+  address: Address;
+  signature: Address;
   message: string;
 }
 
@@ -17,13 +17,13 @@ export const login = async ({ address, signature, message }: Props) => {
       signature,
       message,
     });
+    console.log("login success");
   } catch (error: unknown) {
     if (isRedirectError(error)) {
-      throw error;
+      console.error("redirect error");
     }
-    throw error;
-  } finally {
-    redirect("/");
+
+    console.error(error);
   }
 };
 
@@ -33,7 +33,5 @@ export const logout = async () => {
   } catch (error: unknown) {
     console.error(error);
     throw error;
-  } finally {
-    redirect("/signin");
   }
 };
