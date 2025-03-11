@@ -16,7 +16,7 @@ import {
   DialogTrigger,
 } from "@/app/_components/ui/dialog";
 import { useState } from "react";
-import { Address } from "viem";
+import type { Address } from "viem";
 import { getSession, useSession } from "next-auth/react";
 
 const message = env.NEXT_PUBLIC_SIGN_MESSAGE;
@@ -47,6 +47,7 @@ const Wallet = () => {
   };
 
   const buttonText = () => {
+    console.log(authState);
     switch (authState) {
       case EAuthState.DISCONNECTED:
         return "Connect Wallet";
@@ -57,7 +58,7 @@ const Wallet = () => {
       case EAuthState.SIGNING:
         return "Signing...";
       case EAuthState.SIGNED:
-        return truncateAddress(address);
+        return truncateAddress(user?.id);
       case EAuthState.ERROR:
         return "Error";
       default:

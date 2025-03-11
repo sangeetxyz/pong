@@ -19,8 +19,14 @@ import {
 } from "@react-three/postprocessing";
 import { proxy, useSnapshot } from "valtio";
 import { clamp } from "lodash-es";
-import { gameAtom, setGameAtom, useGameAtom } from "@/atoms/game.atom";
+import {
+  gameAtom,
+  resetGameAtom,
+  setGameAtom,
+  useGameAtom,
+} from "@/atoms/game.atom";
 import { useAtom } from "jotai";
+import useGame from "@/hooks/useGame";
 
 // Define types
 type GameState = {
@@ -69,28 +75,27 @@ const createAudio = (src: string): HTMLAudioElement => {
 };
 
 // Initialize game state
-const state = proxy<GameState>({
-  count: 0,
-  api: {
-    pong(velocity: number) {
-      const ping = createAudio("/ping.mp3");
-      ping.currentTime = 0;
-      ping.volume = clamp(velocity / 20, 0, 1);
-      ping.play().catch(() => {}); // Handle autoplay restrictions
-      if (velocity > 10) ++state.count;
-    },
-    reset() {
-      state.count = 0;
-    },
-  },
-});
+// const state = proxy<GameState>({
+//   count: 0,
+//   api: {
+//     pong(velocity: number) {
+//       const ping = createAudio("/ping.mp3");
+//       ping.currentTime = 0;
+//       ping.volume = clamp(velocity / 20, 0, 1);
+//       ping.play().catch(() => {}); // Handle autoplay restrictions
+//       if (velocity > 10) ++state.count;
+//     },
+//     reset() {
+//       state.count = 0;
+//     },
+//   },
+// });
 
 // Memoized Paddle component
 const Paddle = memo(({ position }: PaddleProps) => {
   const api = useRef<React.ComponentRef<typeof RigidBody>>(null);
   const model = useRef<THREE.Group>(null);
-  const { count } = useSnapshot(state);
-  const [game, setGame] = useGameAtom();
+  const { pong, gameState } = useGame();
   const { nodes, materials } = useGLTF(
     "/pingpong.glb",
   ) as unknown as GLTFResult;
@@ -99,14 +104,12 @@ const Paddle = memo(({ position }: PaddleProps) => {
 
   const contactForce = useCallback(
     (payload: { totalForceMagnitude: number }) => {
-      if (payload.totalForceMagnitude / 100 > 10) {
-        setGame((prev) => ({ ...prev, count: prev.count + 1 }));
-      }
+      pong(payload.totalForceMagnitude / 100);
       if (model.current) {
         model.current.position.y = -payload.totalForceMagnitude / 10000;
       }
     },
-    [setGame],
+    [pong],
   );
 
   useFrame((state, delta) => {
@@ -169,7 +172,7 @@ const Paddle = memo(({ position }: PaddleProps) => {
           position={[0, 1, 0]}
           fontSize={10}
         >
-          {game.count}
+          {gameState.count}
         </Text>
         {/* {nodes.Bone &&
           nodes.Bone003 &&
@@ -238,15 +241,16 @@ const Paddle = memo(({ position }: PaddleProps) => {
 const Ball = memo(({ position = [0, 5, 0] }: BallProps) => {
   const api = useRef<React.ComponentRef<typeof RigidBody>>(null);
   const map = useTexture("/crossp.jpg");
+  const { endGame } = useGame();
   const { viewport } = useThree();
 
   const onCollisionEnter = useCallback(() => {
-    state.api.reset();
+    endGame();
     if (api.current) {
       api.current.setTranslation({ x: 0, y: 5, z: 0 }, true);
       api.current.setLinvel({ x: 0, y: 5, z: 0 }, true);
     }
-  }, []);
+  }, [endGame]);
 
   return (
     <group position={position}>
@@ -335,7 +339,7 @@ const Game = () => {
         shadow-bias={-0.0001}
       />
       <Physics gravity={[0, -40, 0]} timeStep="vary">
-        {/* <Ball position={[0, 5, 0]} /> */}
+        <Ball position={[0, 5, 0]} />
         <Paddle position={[0, 0, 0]} />
       </Physics>
       <Effects />
