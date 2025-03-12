@@ -5,7 +5,7 @@ import {
   protectedProcedure,
   publicProcedure,
 } from "@/server/api/trpc";
-import { wait } from "@/lib/utils";
+// import { wait } from "@/lib/utils";
 import { env } from "@/env";
 import {
   createPublicClient,
@@ -153,11 +153,11 @@ const rewardUser = async (
       account,
     });
 
-    const pongTokenContract = getContract({
-      address: pongTokenAddress,
-      abi: PongTokenABI,
-      client: publicClient,
-    });
+    // const pongTokenContract = getContract({
+    //   address: pongTokenAddress,
+    //   abi: PongTokenABI,
+    //   client: publicClient,
+    // });
 
     const pongTokenContractWithWallet = getContract({
       address: pongTokenAddress,

@@ -17,8 +17,8 @@ const useAuth = () => {
   const [authState, setAuthState] = useState<EAuthState>(
     EAuthState.DISCONNECTED,
   );
-  const { status: appkitStatus, address } = useAppKitAccount();
-  const { status: nextAuthStatus, data, update } = useSession();
+  const { status: appkitStatus } = useAppKitAccount();
+  const { status: nextAuthStatus, data } = useSession();
 
   useEffect(() => {
     if (nextAuthStatus === "authenticated" && !!data.user.id) {
@@ -40,7 +40,7 @@ const useAuth = () => {
           break;
       }
     }
-  }, [appkitStatus, nextAuthStatus]);
+  }, [appkitStatus, nextAuthStatus, data?.user.id]);
 
   return { authState, setAuthState, user: data?.user };
 };

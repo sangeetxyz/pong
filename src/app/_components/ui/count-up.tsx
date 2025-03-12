@@ -90,7 +90,6 @@ export default function CountUp({
   useEffect(() => {
     const unsubscribe = springValue.on("change", (latest) => {
       if (ref.current) {
-        const valueAsNumber = Number(latest.toFixed(0));
         const options: Intl.NumberFormatOptions = {
           useGrouping: !!separator,
           minimumFractionDigits: 0,

@@ -1,4 +1,4 @@
-import { CredentialsSignin, User } from "next-auth";
+import { CredentialsSignin } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import { verifyMessage, type Address } from "viem";
 import { z } from "zod";

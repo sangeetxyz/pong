@@ -13,7 +13,6 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/app/_components/ui/dialog";
 import { useState } from "react";
 import type { Address } from "viem";

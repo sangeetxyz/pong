@@ -1,5 +1,5 @@
-import { useAtom, useAtomValue, useSetAtom } from "jotai/react";
-import { atomWithReset, useResetAtom } from "jotai/utils";
+import { useAtom } from "jotai/react";
+import { atomWithReset } from "jotai/utils";
 
 type TGameState = {
   count: number;
@@ -26,9 +26,3 @@ const initialGameState: TGameState = {
 export const gameAtom = atomWithReset<TGameState>(initialGameState);
 
 export const useGameAtom = () => useAtom(gameAtom);
-
-export const setGameAtom = () => useSetAtom(gameAtom);
-
-export const getGameAtom = () => useAtomValue(gameAtom);
-
-export const resetGameAtom = () => useResetAtom(gameAtom);

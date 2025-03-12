@@ -1,9 +1,8 @@
 import * as THREE from "three";
 import type React from "react";
 import { useCallback, useRef, memo, Suspense } from "react";
-import { Canvas, useFrame, useThree, extend } from "@react-three/fiber";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import {
-  Text,
   useGLTF,
   useTexture,
   useProgress,
@@ -25,15 +24,6 @@ import {
   TiltShift2,
   ToneMapping,
 } from "@react-three/postprocessing";
-import { proxy, useSnapshot } from "valtio";
-import { clamp } from "lodash-es";
-import {
-  gameAtom,
-  resetGameAtom,
-  setGameAtom,
-  useGameAtom,
-} from "@/atoms/game.atom";
-import { useAtom } from "jotai";
 import useGame from "@/hooks/useGame";
 
 type PaddleProps = {
@@ -67,11 +57,10 @@ type GLTFResult = {
   };
 };
 
-// Memoized Paddle component
 const Paddle = memo(({ position }: PaddleProps) => {
   const api = useRef<React.ComponentRef<typeof RigidBody>>(null);
   const model = useRef<THREE.Group>(null);
-  const { pong, count } = useGame();
+  const { pong } = useGame();
   const { nodes, materials } = useGLTF(
     "/pingpong.glb",
   ) as unknown as GLTFResult;
@@ -209,15 +198,16 @@ const Paddle = memo(({ position }: PaddleProps) => {
   );
 });
 
-// Memoized Ball component
+Paddle.displayName = "Paddle";
+
 const Ball = memo(({ position = [0, 5, 0] }: BallProps) => {
   const api = useRef<React.ComponentRef<typeof RigidBody>>(null);
   const map = useTexture("/crossp.jpg");
   const { endGame } = useGame();
   const { viewport } = useThree();
 
-  const onCollisionEnter = useCallback(() => {
-    endGame();
+  const onCollisionEnter = useCallback(async () => {
+    await endGame();
     if (api.current) {
       api.current.setTranslation({ x: 0, y: 5, z: 0 }, true);
       api.current.setLinvel({ x: 0, y: 5, z: 0 }, true);
@@ -267,7 +257,8 @@ const Ball = memo(({ position = [0, 5, 0] }: BallProps) => {
   );
 });
 
-// Background component
+Ball.displayName = "Ball";
+
 const Background = memo(() => {
   const texture = useTexture("/bg1.jpg");
   // Now we handle camera movement here
@@ -292,7 +283,8 @@ const Background = memo(() => {
   );
 });
 
-// Rendering effects component
+Background.displayName = "Background";
+
 const Effects = memo(() => (
   <EffectComposer enableNormalPass={false}>
     <N8AO aoRadius={0.5} intensity={2} />
@@ -300,6 +292,8 @@ const Effects = memo(() => (
     <ToneMapping />
   </EffectComposer>
 ));
+
+Effects.displayName = "Effects";
 
 const Loader = () => {
   const { active } = useProgress();
@@ -318,7 +312,6 @@ const Loader = () => {
   );
 };
 
-// Main Game component
 const Game = () => {
   const { isPlaying } = useGame();
   return (
@@ -350,7 +343,7 @@ const Game = () => {
         )}
         <Effects />
         <Background />
-        {/* <Stats showPanel={0} /> */}
+        <Stats showPanel={0} />
       </Suspense>
     </Canvas>
   );

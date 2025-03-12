@@ -4,9 +4,9 @@ import useGame from "@/hooks/useGame";
 import Wallet from "./_components/buttons/Wallet";
 import Game from "./_components/home/Game";
 import GameModal from "./_components/modals/GameModal";
-import { RiPingPongFill, RiPingPongLine } from "react-icons/ri";
+import { RiPingPongLine } from "react-icons/ri";
 import { Button } from "./_components/ui/button";
-import { IoSettingsOutline, IoSettingsSharp } from "react-icons/io5";
+import { IoSettingsSharp } from "react-icons/io5";
 import { useEffect, useState } from "react";
 import CountUp from "./_components/ui/count-up";
 

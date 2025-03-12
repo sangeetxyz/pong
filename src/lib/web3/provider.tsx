@@ -1,11 +1,10 @@
 "use client";
 
 import { wagmiAdapter, projectId } from "@/lib/web3/config";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createAppKit } from "@reown/appkit/react";
 import { mainnet, arbitrum } from "@reown/appkit/networks";
 import React, { type ReactNode } from "react";
-import { cookieToInitialState, WagmiProvider, type Config } from "wagmi";
+import { cookieToInitialState, WagmiProvider } from "wagmi";
 import { TRPCReactProvider } from "@/trpc/react";
 import { SessionProvider } from "next-auth/react";
 
@@ -22,7 +21,7 @@ const metadata = {
 };
 
 // Create the modal
-const modal = createAppKit({
+createAppKit({
   adapters: [wagmiAdapter],
   projectId,
   networks: [mainnet, arbitrum],
