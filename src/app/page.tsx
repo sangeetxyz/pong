@@ -8,6 +8,7 @@ import { RiPingPongFill, RiPingPongLine } from "react-icons/ri";
 import { Button } from "./_components/ui/button";
 import { IoSettingsOutline, IoSettingsSharp } from "react-icons/io5";
 import { useEffect, useState } from "react";
+import CountUp from "./_components/ui/count-up";
 
 export default function Home() {
   return (
@@ -24,13 +25,14 @@ export default function Home() {
 }
 
 const GameScore = () => {
-  const { startGame, count, isOpen, score, multiplier } = useGame();
+  const { score, multiplier } = useGame();
   return (
     <div className="absolute left-8 top-8 flex flex-col">
       <div className="uppercase">score</div>
       <div className="relative -left-1 flex place-items-baseline space-x-1">
         <div className="bg-gradient-to-r from-lime-500 to-lime-300 bg-clip-text text-7xl font-extrabold text-transparent">
-          {score.toFixed(0).padStart(2, "0")}
+          {/* {score.toFixed(0).padStart(2, "0")} */}
+          <CountUp from={0} to={score} separator="," />
         </div>
         {multiplier > 1 && (
           <div className="font-bold text-yellow-400">

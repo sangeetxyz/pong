@@ -1,8 +1,15 @@
 import * as THREE from "three";
 import type React from "react";
-import { useCallback, useRef, memo } from "react";
+import { useCallback, useRef, memo, Suspense } from "react";
 import { Canvas, useFrame, useThree, extend } from "@react-three/fiber";
-import { Text, useGLTF, useTexture } from "@react-three/drei";
+import {
+  Text,
+  useGLTF,
+  useTexture,
+  useProgress,
+  Html,
+  Stats,
+} from "@react-three/drei";
 import {
   Physics,
   RigidBody,
@@ -11,6 +18,7 @@ import {
   BallCollider,
 } from "@react-three/rapier";
 import { easing } from "maath";
+import MoonLoader from "react-spinners/MoonLoader";
 import {
   EffectComposer,
   N8AO,
@@ -293,10 +301,26 @@ const Effects = memo(() => (
   </EffectComposer>
 ));
 
+const Loader = () => {
+  const { active } = useProgress();
+  return (
+    <Html center className="h-screen w-screen">
+      <div className="flex h-full w-full items-center justify-center">
+        <MoonLoader
+          size={50}
+          aria-label="Loading Spinner"
+          data-testid="loader"
+          color={"#fff"}
+          loading={active}
+        />
+      </div>
+    </Html>
+  );
+};
+
 // Main Game component
 const Game = () => {
   const { isPlaying } = useGame();
-
   return (
     <Canvas
       shadows
@@ -305,26 +329,29 @@ const Game = () => {
       camera={{ position: [0, 5, 12], fov: 45 }}
       performance={{ min: 0.5 }}
     >
-      <color attach="background" args={["#f0f0f0"]} />
-      <ambientLight intensity={0.5 * Math.PI} />
-      <spotLight
-        decay={0}
-        position={[-10, 15, -5]}
-        angle={1}
-        penumbra={1}
-        intensity={2}
-        castShadow
-        shadow-mapSize={1024}
-        shadow-bias={-0.0001}
-      />
-      {isPlaying && (
-        <Physics gravity={[0, -40, 0]} timeStep="vary">
-          <Ball position={[0, 5, 0]} />
-          <Paddle position={[0, 0, 0]} />
-        </Physics>
-      )}
-      <Effects />
-      <Background />
+      <Suspense fallback={<Loader />}>
+        <color attach="background" args={["#f0f0f0"]} />
+        <ambientLight intensity={0.5 * Math.PI} />
+        <spotLight
+          decay={0}
+          position={[-10, 15, -5]}
+          angle={1}
+          penumbra={1}
+          intensity={2}
+          castShadow
+          shadow-mapSize={1024}
+          shadow-bias={-0.0001}
+        />
+        {isPlaying && (
+          <Physics gravity={[0, -40, 0]} timeStep="vary">
+            <Ball position={[0, 5, 0]} />
+            <Paddle position={[0, 0, 0]} />
+          </Physics>
+        )}
+        <Effects />
+        <Background />
+        {/* <Stats showPanel={0} /> */}
+      </Suspense>
     </Canvas>
   );
 };

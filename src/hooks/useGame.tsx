@@ -1,4 +1,5 @@
 import { useGameAtom } from "@/atoms/game.atom";
+import { useProgress } from "@react-three/drei";
 import { clamp } from "lodash-es";
 import React, { useCallback } from "react";
 
@@ -7,7 +8,7 @@ const createAudio = (src: string): HTMLAudioElement => {
   return new Audio(src);
 };
 
-const MULTIPLIER_GROWTH_RATE = 0.05;
+const MULTIPLIER_GROWTH_RATE = 0.95;
 
 /**
  * Returns a dynamic multiplier based on how many bounces (count) the player has achieved.

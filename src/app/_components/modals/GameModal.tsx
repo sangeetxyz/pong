@@ -9,14 +9,16 @@ import {
 import useGame from "@/hooks/useGame";
 import { Button } from "../ui/button";
 import { RiPingPongLine } from "react-icons/ri";
+import { useProgress } from "@react-three/drei";
 
 const GameModal = () => {
   const { startGame, score, isOpen, explore, multiplier } = useGame();
+  const { active } = useProgress();
 
   const hasScore = score > 0;
 
   return (
-    <Dialog open={isOpen}>
+    <Dialog open={isOpen && !active}>
       <DialogContent
         disableX
         className="w-96 rounded-3xl bg-zinc-950/50 p-6 shadow-xl backdrop-blur-md"
@@ -42,7 +44,7 @@ const GameModal = () => {
             <div className="relative bg-gradient-to-r from-lime-500 to-lime-300 bg-clip-text text-7xl font-extrabold text-transparent">
               {score.toFixed(0)}
               {multiplier > 1 && (
-                <div className="absolute bottom-1.5 -right-10 text-base font-bold text-yellow-400">
+                <div className="absolute -right-10 bottom-1.5 text-base font-bold text-yellow-400">
                   x{multiplier.toFixed(1)}
                 </div>
               )}
