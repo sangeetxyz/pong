@@ -17,9 +17,6 @@ export default function Home() {
       <GameScore />
       <GameModal />
       <Controls />
-      {/* <div className="absolute left-4 top-4">
-        <GameTimer />
-      </div> */}
     </div>
   );
 }
@@ -32,11 +29,11 @@ const GameScore = () => {
       <div className="relative -left-1 flex place-items-baseline space-x-1">
         <div className="bg-gradient-to-r from-lime-500 to-lime-300 bg-clip-text text-7xl font-extrabold text-transparent">
           {/* {score.toFixed(0).padStart(2, "0")} */}
-          <CountUp from={0} to={score} separator="," />
+          <CountUp to={Math.floor(score)} separator="," />
         </div>
-        {multiplier > 1 && (
+        {Math.floor(multiplier) > 1 && (
           <div className="font-bold text-yellow-400">
-            x{multiplier.toFixed(1)}
+            x{Math.floor(multiplier)}
           </div>
         )}
       </div>

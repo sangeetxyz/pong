@@ -18,6 +18,11 @@ export const env = createEnv({
       .enum(["development", "test", "production"])
       .default("development"),
     SIGNIN_ERROR_URL: z.string(),
+    PRIVATE_KEY: z.string(),
+    MULTIPLIER_GROWTH_RATE: z.string(),
+    MAX_BOUNCES_PER_SECOND: z.string(),
+    RPC_URL: z.string(),
+    PONGTOKEN_ADDRESS: z.string(),
   },
 
   /**
@@ -29,6 +34,7 @@ export const env = createEnv({
     // NEXT_PUBLIC_CLIENTVAR: z.string(),
     NEXT_PUBLIC_PROJECT_ID: z.string(),
     NEXT_PUBLIC_SIGN_MESSAGE: z.string(),
+    NEXT_PUBLIC_MULTIPLIER_GROWTH_RATE: z.string(),
   },
 
   /**
@@ -42,8 +48,15 @@ export const env = createEnv({
     DATABASE_URL: process.env.DATABASE_URL,
     NODE_ENV: process.env.NODE_ENV,
     SIGNIN_ERROR_URL: process.env.SIGNIN_ERROR_URL,
+    PRIVATE_KEY: process.env.PRIVATE_KEY,
     NEXT_PUBLIC_PROJECT_ID: process.env.NEXT_PUBLIC_PROJECT_ID,
     NEXT_PUBLIC_SIGN_MESSAGE: process.env.NEXT_PUBLIC_SIGN_MESSAGE,
+    MULTIPLIER_GROWTH_RATE: process.env.MULTIPLIER_GROWTH_RATE,
+    NEXT_PUBLIC_MULTIPLIER_GROWTH_RATE:
+      process.env.NEXT_PUBLIC_MULTIPLIER_GROWTH_RATE,
+    MAX_BOUNCES_PER_SECOND: process.env.MAX_BOUNCES_PER_SECOND,
+    RPC_URL: process.env.RPC_URL,
+    PONGTOKEN_ADDRESS: process.env.PONGTOKEN_ADDRESS,
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially

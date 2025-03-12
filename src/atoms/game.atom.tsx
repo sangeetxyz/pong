@@ -5,6 +5,7 @@ type TGameState = {
   count: number;
   playing: boolean;
   isOpen: boolean;
+  isLoading: boolean;
   startTime: number | null;
   endTime: number | null;
   score: number;
@@ -14,6 +15,7 @@ type TGameState = {
 const initialGameState: TGameState = {
   count: 0,
   playing: false,
+  isLoading: false,
   isOpen: true,
   startTime: null,
   endTime: null,

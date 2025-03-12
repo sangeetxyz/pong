@@ -1,8 +1,9 @@
 "use server";
 
 import { signIn, signOut } from "@/server/auth";
+import { api } from "@/trpc/server";
 import { isRedirectError } from "next/dist/client/components/redirect-error";
-import { Address } from "viem";
+import type { Address } from "viem";
 
 interface Props {
   address: Address;
@@ -34,4 +35,16 @@ export const logout = async () => {
     console.error(error);
     throw error;
   }
+};
+
+type TGetToken = {
+  score: number;
+  startTime: number;
+  endTime: number;
+  count: number;
+};
+
+export const getToken = async (params: TGetToken) => {
+  const res = await api.token.get(params);
+  return res;
 };

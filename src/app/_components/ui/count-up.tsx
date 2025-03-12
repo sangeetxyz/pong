@@ -43,7 +43,8 @@ export default function CountUp({
   // Set initial text content to the initial value based on direction
   useEffect(() => {
     if (ref.current) {
-      ref.current.textContent = String(direction === "down" ? to : from);
+      const initialValue = direction === "down" ? to : from;
+      ref.current.textContent = String(initialValue).padStart(2, "0");
     }
   }, [from, to, direction]);
 
@@ -89,15 +90,16 @@ export default function CountUp({
   useEffect(() => {
     const unsubscribe = springValue.on("change", (latest) => {
       if (ref.current) {
-        const options = {
+        const valueAsNumber = Number(latest.toFixed(0));
+        const options: Intl.NumberFormatOptions = {
           useGrouping: !!separator,
           minimumFractionDigits: 0,
           maximumFractionDigits: 0,
         };
 
-        const formattedNumber = Intl.NumberFormat("en-US", options).format(
-          Number(latest.toFixed(0)),
-        );
+        const formattedNumber = Intl.NumberFormat("en-US", options)
+          .format(Number(latest.toFixed(0)))
+          .padStart(2, "0");
 
         ref.current.textContent = separator
           ? formattedNumber.replace(/,/g, separator)

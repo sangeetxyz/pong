@@ -12,7 +12,8 @@ import { RiPingPongLine } from "react-icons/ri";
 import { useProgress } from "@react-three/drei";
 
 const GameModal = () => {
-  const { startGame, score, isOpen, explore, multiplier } = useGame();
+  const { startGame, score, isOpen, explore, multiplier, isLoading } =
+    useGame();
   const { active } = useProgress();
 
   const hasScore = score > 0;
@@ -41,11 +42,13 @@ const GameModal = () => {
           )}
 
           {hasScore && (
-            <div className="relative bg-gradient-to-r from-lime-500 to-lime-300 bg-clip-text text-7xl font-extrabold text-transparent">
-              {score.toFixed(0)}
-              {multiplier > 1 && (
-                <div className="absolute -right-10 bottom-1.5 text-base font-bold text-yellow-400">
-                  x{multiplier.toFixed(1)}
+            <div className="flex flex-col place-items-baseline space-y-1">
+              <div className="bg-gradient-to-r from-lime-500 to-lime-300 bg-clip-text text-7xl font-extrabold text-transparent">
+                {Math.floor(score).toFixed(0).padStart(2, "0")}
+              </div>
+              {Math.floor(multiplier) > 1 && (
+                <div className="w-full text-center text-xs text-yellow-400">
+                  With x{Math.floor(multiplier)} multiplier
                 </div>
               )}
             </div>
@@ -59,11 +62,15 @@ const GameModal = () => {
               Go Back
             </Button>
             <Button
+              disabled={isLoading}
               onClick={startGame}
-              // variant={"secondary"}
               className="w-full rounded-xl"
             >
-              {hasScore ? "Restart Game" : "Start Game"}
+              {isLoading
+                ? "Validating Score..."
+                : hasScore
+                  ? "Restart Game"
+                  : "Start Game"}
             </Button>
           </div>
         </div>

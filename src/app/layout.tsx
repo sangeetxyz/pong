@@ -6,6 +6,7 @@ import type { Metadata } from "next";
 import { ThemeProvider } from "./_components/theme";
 import ReownProvider from "@/lib/web3/provider";
 import { cookies as nextCookies } from "next/headers";
+import { Toaster } from "./_components/ui/sonner";
 
 export const metadata: Metadata = {
   title: "Create T3 App",
@@ -28,6 +29,7 @@ export default async function RootLayout({
             forcedTheme="dark"
           >
             {children}
+            <Toaster />
           </ThemeProvider>
         </ReownProvider>
       </body>

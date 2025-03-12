@@ -1,37 +1,14 @@
 import { useGameAtom } from "@/atoms/game.atom";
-import { useProgress } from "@react-three/drei";
+import { getToken } from "@/lib/action";
+import { calculateScore, getScoreMultiplier } from "@/lib/utils";
 import { clamp } from "lodash-es";
 import React, { useCallback } from "react";
+import { toast } from "sonner";
 
 const createAudio = (src: string): HTMLAudioElement => {
   if (typeof window === "undefined") return {} as HTMLAudioElement;
   return new Audio(src);
 };
-
-const MULTIPLIER_GROWTH_RATE = 0.95;
-
-/**
- * Returns a dynamic multiplier based on how many bounces (count) the player has achieved.
- *
- * @param {number} count - The number of successful bounces the player has made.
- * @returns {number} The calculated multiplier.
- */
-function getScoreMultiplier(count: number): number {
-  // If count is 0 (or less), don't apply any multiplier.
-  if (count <= 0) return 1;
-
-  // Example: Exponential growth
-  // multiplier = (1 + growthRate) ^ count
-  // e.g., with a rate of 0.05 and 10 bounces,
-  // multiplier = (1.05)^10 ≈ 1.63
-  // If you want a different shape (e.g., linear), see alternative examples below.
-  return (1 + MULTIPLIER_GROWTH_RATE) ** count;
-}
-
-function calculateScore(count: number, basePoints = 1) {
-  const multiplier = getScoreMultiplier(count);
-  return basePoints * multiplier;
-}
 
 const useGame = () => {
   const [gameState, setGameState] = useGameAtom();
@@ -45,12 +22,15 @@ const useGame = () => {
 
       // Update score if velocity is high enough
       if (velocity > 10) {
-        setGameState((prev) => ({
-          ...prev,
-          count: prev.count + 1,
-          score: prev.score + calculateScore(prev.count),
-          multiplier: getScoreMultiplier(prev.count),
-        }));
+        setGameState((prev) => {
+          const newCount = prev.count + 1;
+          return {
+            ...prev,
+            count: newCount,
+            score: prev.score + calculateScore(newCount),
+            multiplier: getScoreMultiplier(newCount),
+          };
+        });
       }
     },
     [setGameState],
@@ -68,14 +48,24 @@ const useGame = () => {
     }));
   }, [setGameState]);
 
-  const endGame = useCallback(() => {
+  const endGame = useCallback(async () => {
+    if (!gameState.startTime) return;
     setGameState((prev) => ({
       ...prev,
       playing: false,
       isOpen: true,
       endTime: Date.now(),
+      isLoading: true,
     }));
-  }, [setGameState]);
+    const res = await getToken({
+      score: gameState.score,
+      startTime: gameState.startTime,
+      endTime: Date.now(),
+      count: gameState.count,
+    });
+    handleRes(res);
+    setGameState((prev) => ({ ...prev, isLoading: false }));
+  }, [setGameState, gameState]);
 
   const explore = useCallback(() => {
     setGameState((prev) => ({
@@ -112,7 +102,22 @@ const useGame = () => {
     },
     score: gameState.score,
     multiplier: gameState.multiplier,
+    isLoading: gameState.isLoading,
   };
 };
 
 export default useGame;
+
+const handleRes = ({
+  success,
+  message,
+}: {
+  success: boolean;
+  message: string;
+}) => {
+  if (!success) {
+    toast.error(message);
+    return;
+  }
+  toast.success(message);
+};
