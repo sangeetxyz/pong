@@ -28,15 +28,6 @@ import {
 import { useAtom } from "jotai";
 import useGame from "@/hooks/useGame";
 
-// Define types
-type GameState = {
-  count: number;
-  api: {
-    pong: (velocity: number) => void;
-    reset: () => void;
-  };
-};
-
 type PaddleProps = {
   position?: [number, number, number];
 };
@@ -68,40 +59,17 @@ type GLTFResult = {
   };
 };
 
-// Create a reusable audio instance
-const createAudio = (src: string): HTMLAudioElement => {
-  if (typeof window === "undefined") return {} as HTMLAudioElement;
-  return new Audio(src);
-};
-
-// Initialize game state
-// const state = proxy<GameState>({
-//   count: 0,
-//   api: {
-//     pong(velocity: number) {
-//       const ping = createAudio("/ping.mp3");
-//       ping.currentTime = 0;
-//       ping.volume = clamp(velocity / 20, 0, 1);
-//       ping.play().catch(() => {}); // Handle autoplay restrictions
-//       if (velocity > 10) ++state.count;
-//     },
-//     reset() {
-//       state.count = 0;
-//     },
-//   },
-// });
-
 // Memoized Paddle component
 const Paddle = memo(({ position }: PaddleProps) => {
   const api = useRef<React.ComponentRef<typeof RigidBody>>(null);
   const model = useRef<THREE.Group>(null);
-  const { pong, gameState } = useGame();
+  const { pong, count } = useGame();
   const { nodes, materials } = useGLTF(
     "/pingpong.glb",
   ) as unknown as GLTFResult;
+  const imageTexture = useTexture("/hud-white.png");
   const vec = useRef(new THREE.Vector3());
   const dir = useRef(new THREE.Vector3());
-
   const contactForce = useCallback(
     (payload: { totalForceMagnitude: number }) => {
       pong(payload.totalForceMagnitude / 100);
@@ -142,15 +110,7 @@ const Paddle = memo(({ position }: PaddleProps) => {
       easing.damp3(model.current.position, [0, 0, 0], 0.2, delta);
     }
 
-    // Update camera position
-    easing.damp3(
-      camera.position,
-      [-pointer.x * 4, 2.5 + -pointer.y * 4, 12],
-      0.3,
-      delta,
-    );
-
-    camera.lookAt(0, 0, 0);
+    // (Removed camera-movement logic — now in <Background />)
   });
 
   return (
@@ -165,15 +125,19 @@ const Paddle = memo(({ position }: PaddleProps) => {
     >
       <CylinderCollider args={[0.15, 1.75]} />
       <group ref={model} position={[0, 2, 0]} scale={0.15}>
-        <Text
+        {/* <Text
           anchorX="center"
           anchorY="middle"
           rotation={[-Math.PI / 2, 0, 0]}
           position={[0, 1, 0]}
           fontSize={10}
         >
-          {gameState.count}
-        </Text>
+          {count}
+        </Text> */}
+        <mesh position={[0, 1, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+          <planeGeometry args={[9, 9]} />
+          <meshBasicMaterial map={imageTexture} transparent />
+        </mesh>
         {/* {nodes.Bone &&
           nodes.Bone003 &&
           nodes.Bone006 &&
@@ -298,7 +262,20 @@ const Ball = memo(({ position = [0, 5, 0] }: BallProps) => {
 // Background component
 const Background = memo(() => {
   const texture = useTexture("/bg1.jpg");
+  // Now we handle camera movement here
+  useFrame((state, delta) => {
+    const { pointer, camera } = state;
+    // Replicate the logic from the original <Paddle /> component
+    // for camera movement:
 
+    easing.damp3(
+      camera.position,
+      [-pointer.x * 4, 2.5 + pointer.y * -4, 12],
+      0.3,
+      delta,
+    );
+    camera.lookAt(0, 0, 0);
+  });
   return (
     <mesh rotation={[0, Math.PI / 1.25, 0]} scale={100}>
       <sphereGeometry />
@@ -318,6 +295,8 @@ const Effects = memo(() => (
 
 // Main Game component
 const Game = () => {
+  const { isPlaying } = useGame();
+
   return (
     <Canvas
       shadows
@@ -338,10 +317,12 @@ const Game = () => {
         shadow-mapSize={1024}
         shadow-bias={-0.0001}
       />
-      <Physics gravity={[0, -40, 0]} timeStep="vary">
-        <Ball position={[0, 5, 0]} />
-        <Paddle position={[0, 0, 0]} />
-      </Physics>
+      {isPlaying && (
+        <Physics gravity={[0, -40, 0]} timeStep="vary">
+          <Ball position={[0, 5, 0]} />
+          <Paddle position={[0, 0, 0]} />
+        </Physics>
+      )}
       <Effects />
       <Background />
     </Canvas>
@@ -349,19 +330,3 @@ const Game = () => {
 };
 
 export default Game;
-
-// Game management functions
-export const startGame = () => {
-  console.log("Game started!");
-  // You could initialize state here
-  const setGame = setGameAtom();
-  setGame((prev) => ({ ...prev, count: 0 }));
-
-  // You might want to reset ball position or other initialization
-};
-
-export const endGame = () => {
-  console.log("Game ended!");
-  // You could do game end processing here
-  // Perhaps show a game over message or save high scores
-};

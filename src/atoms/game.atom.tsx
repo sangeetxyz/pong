@@ -1,12 +1,27 @@
 import { useAtom, useAtomValue, useSetAtom } from "jotai/react";
 import { atomWithReset, useResetAtom } from "jotai/utils";
 
-const initialGameState = {
-  count: 0,
-  playing: false,
+type TGameState = {
+  count: number;
+  playing: boolean;
+  isOpen: boolean;
+  startTime: number | null;
+  endTime: number | null;
+  score: number;
+  multiplier: number;
 };
 
-export const gameAtom = atomWithReset(initialGameState);
+const initialGameState: TGameState = {
+  count: 0,
+  playing: false,
+  isOpen: true,
+  startTime: null,
+  endTime: null,
+  score: 0,
+  multiplier: 1,
+};
+
+export const gameAtom = atomWithReset<TGameState>(initialGameState);
 
 export const useGameAtom = () => useAtom(gameAtom);
 

@@ -31,7 +31,7 @@ const Wallet = () => {
   const { disconnectAsync } = useDisconnect();
 
   const handleClick = async () => {
-    if (!address) return open({ view: "Connect" });
+    if (!address && !user?.id) return open({ view: "Connect" });
     if (authState === EAuthState.SIGNED) return setIsOpen(true);
     if (authState === EAuthState.CONNECTED) {
       setAuthState(EAuthState.SIGNING);
@@ -47,7 +47,6 @@ const Wallet = () => {
   };
 
   const buttonText = () => {
-    console.log(authState);
     switch (authState) {
       case EAuthState.DISCONNECTED:
         return "Connect Wallet";
@@ -75,7 +74,7 @@ const Wallet = () => {
 
   return (
     <div>
-      <Button className="" onClick={handleClick}>
+      <Button variant={"secondary"} className="" onClick={handleClick}>
         {buttonText()}
       </Button>
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
