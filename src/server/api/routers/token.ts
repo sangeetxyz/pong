@@ -83,7 +83,7 @@ const isValidGameData = (data: TIsValidGameData): boolean => {
   }
 
   const now = Date.now();
-  const MAX_MS = 1000;
+  const MAX_MS = 3000;
   if (now - data.endTime > MAX_MS) {
     console.error(
       `endTime ${data.endTime} is too old. The difference is ${
