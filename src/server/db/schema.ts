@@ -2,6 +2,7 @@ import { relations, sql } from "drizzle-orm";
 import {
   index,
   integer,
+  numeric,
   pgTableCreator,
   primaryKey,
   text,
@@ -17,27 +18,6 @@ import type { AdapterAccount } from "next-auth/adapters";
  * @see https://orm.drizzle.team/docs/goodies#multi-project-schema
  */
 export const createTable = pgTableCreator((name) => `pong_${name}`);
-
-export const posts = createTable(
-  "post",
-  {
-    id: integer("id").primaryKey().generatedByDefaultAsIdentity(),
-    name: varchar("name", { length: 256 }),
-    createdById: varchar("created_by", { length: 255 })
-      .notNull()
-      .references(() => users.id),
-    createdAt: timestamp("created_at", { withTimezone: true })
-      .default(sql`CURRENT_TIMESTAMP`)
-      .notNull(),
-    updatedAt: timestamp("updated_at", { withTimezone: true }).$onUpdate(
-      () => new Date(),
-    ),
-  },
-  (example) => ({
-    createdByIdIdx: index("created_by_idx").on(example.createdById),
-    nameIndex: index("name_idx").on(example.name),
-  }),
-);
 
 export const users = createTable("user", {
   id: varchar("id", { length: 255 })
@@ -127,3 +107,24 @@ export const verificationTokens = createTable(
     compoundKey: primaryKey({ columns: [vt.identifier, vt.token] }),
   }),
 );
+
+export const leaderboard = createTable("leaderboard", {
+  walletAddress: varchar("wallet_address", { length: 42 })
+    .notNull()
+    .primaryKey(),
+  highScore: numeric("high_score", { precision: 50, scale: 0 }).notNull(),
+  longestSurvival: numeric("longest_survival", {
+    precision: 50,
+    scale: 0,
+  }).notNull(),
+  pongTokenCount: numeric("pong_token_count", {
+    precision: 50,
+    scale: 0,
+  }).notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .default(sql`CURRENT_TIMESTAMP`),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .default(sql`CURRENT_TIMESTAMP`),
+});

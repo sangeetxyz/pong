@@ -1,4 +1,3 @@
-import { postRouter } from "@/server/api/routers/post";
 import { createCallerFactory, createTRPCRouter } from "@/server/api/trpc";
 import { tokenRouter } from "./routers/token";
 
@@ -8,7 +7,6 @@ import { tokenRouter } from "./routers/token";
  * All routers added in /api/routers should be manually added here.
  */
 export const appRouter = createTRPCRouter({
-  post: postRouter,
   token: tokenRouter,
 });
 

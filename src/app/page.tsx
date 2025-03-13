@@ -9,6 +9,7 @@ import { Button } from "./_components/ui/button";
 import { IoSettingsSharp } from "react-icons/io5";
 import { useEffect, useState } from "react";
 import CountUp from "./_components/ui/count-up";
+// import { LucideClock4 } from "lucide-react";
 
 export default function Home() {
   return (
@@ -105,8 +106,18 @@ const GameTimer = () => {
   }, [startTime, endTime]);
 
   if (!startTime && !endTime) {
-    return <div>00:00</div>;
+    return (
+      <div className="flex items-center space-x-1">
+        {/* <LucideClock4 size={16} /> */}
+        <div className="text-base font-normal">00:00</div>
+      </div>
+    );
   }
 
-  return <div>{formatTime(elapsed)}</div>;
+  return (
+    <div className="flex items-center space-x-1">
+      {/* <LucideClock4 size={16}  /> */}
+      <div>{formatTime(elapsed)}</div>
+    </div>
+  );
 };

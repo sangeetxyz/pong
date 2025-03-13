@@ -1,35 +1,11 @@
 import { z } from "zod";
-
-import {
-  createTRPCRouter,
-  protectedProcedure,
-  publicProcedure,
-} from "@/server/api/trpc";
-// import { wait } from "@/lib/utils";
+import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
 import { env } from "@/env";
-import {
-  createPublicClient,
-  createWalletClient,
-  http,
-  getContract,
-  type Address,
-  // waitForTransactionReceipt,
-} from "viem";
-import { PongTokenABI } from "@/common/abis";
-import { waitForTransactionReceipt } from "viem/actions";
-import { huddle01Testnet } from "viem/chains";
-import { privateKeyToAccount } from "viem/accounts";
-// import { posts } from "@/server/db/schema";
+import { leaderboard } from "@/server/db/schema";
+import { sql } from "drizzle-orm";
+import { getBalance, rewardUser } from "@/server/web3";
 
 export const tokenRouter = createTRPCRouter({
-  hello: publicProcedure
-    .input(z.object({ text: z.string() }))
-    .query(({ input }) => {
-      return {
-        greeting: `Hello ${input.text}`,
-      };
-    }),
-
   get: protectedProcedure
     .input(
       z.object({
@@ -42,35 +18,37 @@ export const tokenRouter = createTRPCRouter({
     .query(async ({ input, ctx }) => {
       const isValid = isValidGameData(input);
       if (!isValid) return { success: false, message: "Invalid game data." };
-      if (Math.floor(input.score) < 99)
-        return { success: false, message: "Score atleast 100 to get reward." };
+      if (Math.floor(input.score) < Number(env.NEXT_PUBLIC_MINIMUM_SCORE) - 1)
+        return {
+          success: false,
+          message: `Score atleast ${env.NEXT_PUBLIC_MINIMUM_SCORE} to get reward.`,
+        };
       const rewardResult = await rewardUser(ctx.session.user.id, input.score);
       if (!rewardResult)
         return { success: false, message: "Reward failed. Please try again." };
+      const currentScore = Math.floor(input.score);
+      const survivalTime = Math.floor((input.endTime - input.startTime) / 1000);
+      const pongTokenCount = await getBalance(ctx.session.user.id);
+      const a = await ctx.db
+        .insert(leaderboard)
+        .values({
+          walletAddress: ctx.session.user.id,
+          highScore: currentScore.toString(),
+          longestSurvival: survivalTime.toString(),
+          pongTokenCount: pongTokenCount.toString(),
+        })
+        .onConflictDoUpdate({
+          target: [leaderboard.walletAddress],
+          set: {
+            highScore: sql`GREATEST(${leaderboard.highScore}, ${currentScore})`,
+            longestSurvival: sql`GREATEST(${leaderboard.longestSurvival}, ${survivalTime})`,
+            pongTokenCount: sql`GREATEST(${leaderboard.pongTokenCount}, ${pongTokenCount})`,
+            updatedAt: sql`CURRENT_TIMESTAMP`,
+          },
+        });
 
       return { success: true, message: "Reward credited successfully!" };
     }),
-
-  // create: protectedProcedure
-  //   .input(z.object({ name: z.string().min(1) }))
-  //   .mutation(async ({ ctx, input }) => {
-  //     await ctx.db.insert(posts).values({
-  //       name: input.name,
-  //       createdById: ctx.session.user.id,
-  //     });
-  //   }),
-
-  // getLatest: protectedProcedure.query(async ({ ctx }) => {
-  //   const post = await ctx.db.query.posts.findFirst({
-  //     orderBy: (posts, { desc }) => [desc(posts.createdAt)],
-  //   });
-
-  //   return post ?? null;
-  // }),
-
-  getSecretMessage: protectedProcedure.query(() => {
-    return "you can now see this secret message!";
-  }),
 });
 
 type TIsValidGameData = {
@@ -129,59 +107,4 @@ const isValidGameData = (data: TIsValidGameData): boolean => {
 
   // All validations passed.
   return true;
-};
-
-const rewardUser = async (
-  userAddress: Address,
-  score: number,
-): Promise<boolean> => {
-  try {
-    const rpcUrl = env.RPC_URL;
-    const serverPrivateKey = env.PRIVATE_KEY as Address;
-    const pongTokenAddress = env.PONGTOKEN_ADDRESS as Address;
-
-    const publicClient = createPublicClient({
-      chain: huddle01Testnet,
-      transport: http(rpcUrl),
-    });
-
-    const account = privateKeyToAccount(serverPrivateKey);
-
-    const walletClient = createWalletClient({
-      chain: huddle01Testnet,
-      transport: http(rpcUrl),
-      account,
-    });
-
-    // const pongTokenContract = getContract({
-    //   address: pongTokenAddress,
-    //   abi: PongTokenABI,
-    //   client: publicClient,
-    // });
-
-    const pongTokenContractWithWallet = getContract({
-      address: pongTokenAddress,
-      abi: PongTokenABI,
-      client: walletClient,
-    });
-
-    const rewardScore = BigInt(Math.floor(score));
-
-    console.log(
-      `Rewarding ${userAddress} with score ${rewardScore.toString()}`,
-    );
-
-    const txHash = await pongTokenContractWithWallet.write.reward([
-      userAddress,
-      rewardScore,
-    ]);
-
-    await waitForTransactionReceipt(publicClient, { hash: txHash });
-
-    console.log(`Reward transaction successful. Transaction hash: ${txHash}`);
-    return true;
-  } catch (error) {
-    console.error("Reward operation failed:", error);
-    return false;
-  }
 };

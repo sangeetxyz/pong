@@ -295,7 +295,7 @@ const Effects = memo(() => (
 
 Effects.displayName = "Effects";
 
-const Loader = () => {
+const Loader = memo(() => {
   const { active } = useProgress();
   return (
     <Html center className="h-screen w-screen">
@@ -310,7 +310,9 @@ const Loader = () => {
       </div>
     </Html>
   );
-};
+});
+
+Loader.displayName = "Loader";
 
 const Game = () => {
   const { isPlaying } = useGame();

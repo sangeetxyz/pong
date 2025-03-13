@@ -1,5 +1,5 @@
 {
-  "id": "302c067f-c2ff-4019-a58e-5e8611830823",
+  "id": "da907f38-62a5-4aec-a0d9-143c4bda800b",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -118,36 +118,31 @@
       },
       "uniqueConstraints": {}
     },
-    "public.pong_post": {
-      "name": "pong_post",
+    "public.pong_leaderboard": {
+      "name": "pong_leaderboard",
       "schema": "",
       "columns": {
-        "id": {
-          "name": "id",
-          "type": "integer",
+        "wallet_address": {
+          "name": "wallet_address",
+          "type": "varchar(42)",
           "primaryKey": true,
-          "notNull": true,
-          "identity": {
-            "type": "byDefault",
-            "name": "pong_post_id_seq",
-            "schema": "public",
-            "increment": "1",
-            "startWith": "1",
-            "minValue": "1",
-            "maxValue": "2147483647",
-            "cache": "1",
-            "cycle": false
-          }
+          "notNull": true
         },
-        "name": {
-          "name": "name",
-          "type": "varchar(256)",
+        "high_score": {
+          "name": "high_score",
+          "type": "numeric(50, 0)",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
-        "created_by": {
-          "name": "created_by",
-          "type": "varchar(255)",
+        "longest_survival": {
+          "name": "longest_survival",
+          "type": "numeric(50, 0)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "pong_token_count": {
+          "name": "pong_token_count",
+          "type": "numeric(50, 0)",
           "primaryKey": false,
           "notNull": true
         },
@@ -162,56 +157,12 @@
           "name": "updated_at",
           "type": "timestamp with time zone",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true,
+          "default": "CURRENT_TIMESTAMP"
         }
       },
-      "indexes": {
-        "created_by_idx": {
-          "name": "created_by_idx",
-          "columns": [
-            {
-              "expression": "created_by",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "name_idx": {
-          "name": "name_idx",
-          "columns": [
-            {
-              "expression": "name",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        }
-      },
-      "foreignKeys": {
-        "pong_post_created_by_pong_user_id_fk": {
-          "name": "pong_post_created_by_pong_user_id_fk",
-          "tableFrom": "pong_post",
-          "tableTo": "pong_user",
-          "columnsFrom": [
-            "created_by"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
+      "indexes": {},
+      "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
