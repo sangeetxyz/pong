@@ -152,7 +152,7 @@ const Wallet: FC<TWalletProps> = memo(({ className }) => {
                   />
                 </div>
                 {tokenBalance && (
-                  <div className="text-xs">
+                  <div className="rounded-2xl border bg-zinc-900 px-3 py-1 text-xs">
                     {formatEther(tokenBalance)}{" "}
                     <span className="text-lime-400">$PONG</span>
                   </div>
