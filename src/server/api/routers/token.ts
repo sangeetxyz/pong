@@ -62,7 +62,7 @@ export const tokenRouter = createTRPCRouter({
   }),
   getLeaderboardDetails: publicProcedure.query(async ({ ctx }) => {
     const data = await ctx.db.query.leaderboard.findMany({
-      orderBy: (data, { asc }) => [asc(data.pongTokenCount)],
+      orderBy: (data, { desc }) => [desc(data.pongTokenCount)],
       limit: 10,
     });
     return data;

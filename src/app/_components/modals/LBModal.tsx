@@ -40,12 +40,12 @@ const LeaderboardModal = memo(() => {
           <MdLeaderboard className="" />
         </Button>
       </DialogTrigger>
-      <DialogContent className="w-">
+      <DialogContent className="p-2">
         <DialogHeader className="hidden">
           <DialogTitle>{}</DialogTitle>
           <DialogDescription>{}</DialogDescription>
         </DialogHeader>
-        <div className="flex flex-col space-y-4">
+        <div className="mt-2 flex flex-col space-y-4">
           <div className="px-2 text-xl font-bold italic">
             Pong<span className="text-lime-400">01</span>{" "}
             <span className="not-itali font-normal"> rankings</span>
@@ -74,7 +74,7 @@ type TLeaderboardTableProps = {
 
 const LeaderboardTable: FC<TLeaderboardTableProps> = ({ data }) => {
   return (
-    <div className="rounded-xl border border-zinc-800 bg-zinc-900">
+    <div className="rounded-2xl border border-zinc-800 bg-zinc-900">
       <Table className="font-[400]">
         <TableHeader>
           <TableRow className="">
