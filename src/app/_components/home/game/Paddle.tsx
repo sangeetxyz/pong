@@ -13,15 +13,18 @@ type TPaddleProps = {
 };
 
 const Paddle = memo(({ position }: TPaddleProps) => {
-  const api = useRef<React.ComponentRef<typeof RigidBody>>(null);
+  const physicsBody = useRef<React.ComponentRef<typeof RigidBody>>(null);
   const model = useRef<THREE.Group>(null);
   const { pong } = useGame();
   const { nodes, materials } = useGLTF(
     "/pingpong.glb",
   ) as unknown as TGLTFResult;
   const imageTexture = useTexture("/hud-white.png");
-  const vec = useRef(new THREE.Vector3());
-  const dir = useRef(new THREE.Vector3());
+
+  const targetVec = useRef(new THREE.Vector3());
+  const dirVec = useRef(new THREE.Vector3());
+  const rotationQuat = useRef(new THREE.Quaternion());
+
   const contactForce = useCallback(
     (payload: { totalForceMagnitude: number }) => {
       pong(payload.totalForceMagnitude / 100);
@@ -33,43 +36,67 @@ const Paddle = memo(({ position }: TPaddleProps) => {
   );
 
   useFrame((state, delta) => {
-    const camera = state.camera;
-    const pointer = state.pointer;
+    const { camera, pointer } = state;
 
-    // Update paddle position based on pointer
-    vec.current.set(pointer.x, pointer.y, 0.5).unproject(camera);
-    dir.current.copy(vec.current).sub(camera.position).normalize();
-    vec.current.add(dir.current.multiplyScalar(camera.position.length()));
+    let pointerX = pointer.x;
+    let pointerY = pointer.y;
 
-    // Update physics body
-    if (api.current) {
-      api.current.setNextKinematicTranslation({
-        x: vec.current.x,
-        y: vec.current.y,
+    if (pointerX < -1) pointerX = -1;
+    else if (pointerX > 1) pointerX = 1;
+
+    if (pointerY < -1) pointerY = -1;
+    else if (pointerY > 1) pointerY = 1;
+
+    // Reuse existing vectors rather than recreating each frame
+    targetVec.current.set(pointerX, pointerY, 0.5);
+    targetVec.current.unproject(camera);
+
+    dirVec.current.subVectors(targetVec.current, camera.position).normalize();
+    targetVec.current
+      .copy(camera.position)
+      .addScaledVector(dirVec.current, camera.position.length());
+
+    // Update physics only if position/rotation changed significantly
+    if (physicsBody.current) {
+      // Cache previous position to avoid unnecessary updates
+      const currentPos = physicsBody.current.translation();
+      const targetPos = {
+        x: targetVec.current.x,
+        y: targetVec.current.y,
         z: 0,
-      });
+      };
 
-      api.current.setNextKinematicRotation({
-        x: 0,
-        y: 0,
-        z: (pointer.x * Math.PI) / 10,
-        w: 1,
-      });
+      // Only update position if it changed significantly
+      if (
+        Math.abs(currentPos.x - targetPos.x) > 0.001 ||
+        Math.abs(currentPos.y - targetPos.y) > 0.001
+      ) {
+        physicsBody.current.setNextKinematicTranslation(targetPos);
+      }
+
+      // Calculate rotation only when needed
+      const angle = (pointerX * Math.PI) / 5;
+      rotationQuat.current.setFromAxisAngle(new THREE.Vector3(0, 0, 1), angle);
+
+      physicsBody.current.setNextKinematicRotation(rotationQuat.current);
     }
 
-    // Smooth model position
-    if (model.current) {
+    // Smooth model position with optimized easing
+    if (
+      model.current &&
+      (model.current.position.x !== 0 ||
+        model.current.position.y !== 0 ||
+        model.current.position.z !== 0)
+    ) {
       easing.damp3(model.current.position, [0, 0, 0], 0.2, delta);
     }
-
-    // (Removed camera-movement logic — now in <Background />)
   });
 
   return (
     <RigidBody
       ccd
       canSleep={false}
-      ref={api}
+      ref={physicsBody}
       type="kinematicPosition"
       colliders={false}
       onContactForce={contactForce}
@@ -77,39 +104,10 @@ const Paddle = memo(({ position }: TPaddleProps) => {
     >
       <CylinderCollider args={[0.15, 1.75]} />
       <group ref={model} position={[0, 2, 0]} scale={0.15}>
-        {/* <Text
-          anchorX="center"
-          anchorY="middle"
-          rotation={[-Math.PI / 2, 0, 0]}
-          position={[0, 1, 0]}
-          fontSize={10}
-        >
-          {count}
-        </Text> */}
         <mesh position={[0, 1, 0]} rotation={[-Math.PI / 2, 0, 0]}>
           <planeGeometry args={[9, 9]} />
           <meshBasicMaterial map={imageTexture} transparent />
         </mesh>
-        {/* {nodes.Bone &&
-          nodes.Bone003 &&
-          nodes.Bone006 &&
-          nodes.Bone010 &&
-          nodes.arm && (
-            <group rotation={[1.88, -0.35, 2.32]} scale={[2.97, 2.97, 2.97]}>
-              <primitive object={nodes.Bone} />
-              <primitive object={nodes.Bone003} />
-              <primitive object={nodes.Bone006} />
-              <primitive object={nodes.Bone010} />
-              <skinnedMesh
-                castShadow
-                receiveShadow
-                material={materials.glove}
-                material-roughness={1}
-                geometry={(nodes.arm as THREE.Mesh).geometry}
-                skeleton={(nodes.arm as THREE.SkinnedMesh).skeleton}
-              />
-            </group>
-          )} */}
         {nodes.mesh &&
           nodes.mesh_1 &&
           nodes.mesh_2 &&

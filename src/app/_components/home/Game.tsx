@@ -40,9 +40,14 @@ const Game = memo(() => {
     <Canvas
       shadows
       dpr={[1, 1.5]}
-      gl={{ antialias: false }}
+      gl={{
+        antialias: false,
+        powerPreference: "high-performance",
+        depth: false,
+        stencil: false,
+      }}
       camera={{ position: [0, 5, 12], fov: 45 }}
-      performance={{ min: 0.5 }}
+      performance={{ min: 0.8 }}
     >
       <Suspense fallback={<Loader />}>
         <color attach="background" args={["#f0f0f0"]} />
