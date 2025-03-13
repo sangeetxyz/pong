@@ -1,7 +1,6 @@
 import useGame from "@/hooks/useGame";
 import { Button } from "../ui/button";
 import { RiPingPongFill } from "react-icons/ri";
-import { IoSettingsSharp } from "react-icons/io5";
 import Wallet from "../buttons/Wallet";
 import { memo } from "react";
 import useAuth from "@/hooks/useAuth";

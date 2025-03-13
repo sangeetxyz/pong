@@ -1,8 +1,8 @@
 import type * as THREE from "three";
 import type React from "react";
-import { Suspense } from "react";
+import { memo, Suspense } from "react";
 import { Canvas } from "@react-three/fiber";
-import { Stats } from "@react-three/drei";
+// import { Stats } from "@react-three/drei";
 import { Physics } from "@react-three/rapier";
 import useGame from "@/hooks/useGame";
 import Paddle from "./game/Paddle";
@@ -34,7 +34,7 @@ export type TGLTFResult = {
   };
 };
 
-const Game = () => {
+const Game = memo(() => {
   const { isPlaying } = useGame();
   return (
     <Canvas
@@ -65,10 +65,12 @@ const Game = () => {
         )}
         <Effects />
         <Background />
-        <Stats showPanel={0} />
+        {/* <Stats showPanel={0} /> */}
       </Suspense>
     </Canvas>
   );
-};
+});
+
+Game.displayName = "Game";
 
 export default Game;

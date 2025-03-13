@@ -21,7 +21,7 @@ import {
   DialogTitle,
 } from "@/app/_components/ui/dialog";
 import { useReadContract } from "wagmi";
-import { useEffect, useState } from "react";
+import { memo, useEffect, useState } from "react";
 import { formatEther, type Address } from "viem";
 import { getSession, useSession } from "next-auth/react";
 import Image from "next/image";
@@ -32,7 +32,7 @@ import { api } from "@/trpc/react";
 
 const message = env.NEXT_PUBLIC_SIGN_MESSAGE;
 
-const Wallet = () => {
+const Wallet = memo(() => {
   const { authState, setAuthState, user } = useAuth();
   const { update } = useSession();
   const { address } = useAppKitAccount();
@@ -178,6 +178,8 @@ const Wallet = () => {
       )}
     </div>
   );
-};
+});
+
+Wallet.displayName = "Wallet";
 
 export default Wallet;

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { memo } from "react";
 import {
   Dialog,
   DialogContent,
@@ -13,7 +13,7 @@ import { useProgress } from "@react-three/drei";
 import useAuth from "@/hooks/useAuth";
 import { formatLargeNumber } from "@/lib/utils";
 
-const GameModal = () => {
+const GameModal = memo(() => {
   const { startGame, score, isOpen, explore, multiplier, isLoading } =
     useGame();
   const { user } = useAuth();
@@ -28,7 +28,6 @@ const GameModal = () => {
         className="w-96 rounded-3xl bg-zinc-950/50 p-6 shadow-xl backdrop-blur-md"
       >
         <DialogHeader>
-          {/* Conditionally change title & description based on hasScore */}
           <DialogTitle className="text-center text-2xl font-bold text-white">
             {hasScore ? "Ready for another round?" : "Are you ready?"}
           </DialogTitle>
@@ -81,6 +80,8 @@ const GameModal = () => {
       </DialogContent>
     </Dialog>
   );
-};
+});
+
+GameModal.displayName = "GameModal";
 
 export default GameModal;

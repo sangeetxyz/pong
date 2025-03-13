@@ -1,12 +1,10 @@
-import React, { useEffect, useState, type FC } from "react";
+import React, { memo, useEffect, useState, type FC } from "react";
 import { Button } from "../ui/button";
 import { MdLeaderboard } from "react-icons/md";
 import {
   Table,
   TableBody,
-  //   TableCaption,
   TableCell,
-  TableFooter,
   TableHead,
   TableHeader,
   TableRow,
@@ -22,7 +20,7 @@ import {
 import { api } from "@/trpc/react";
 import { formatLargeNumber, formatSeconds, truncateAddress } from "@/lib/utils";
 
-const LeaderboardModal = () => {
+const LeaderboardModal = memo(() => {
   const { data, refetch } = api.token.getLeaderboardDetails.useQuery();
   const [open, setOpen] = useState(false);
 
@@ -57,7 +55,9 @@ const LeaderboardModal = () => {
       </DialogContent>
     </Dialog>
   );
-};
+});
+
+LeaderboardModal.displayName = "LeaderboardModal";
 
 export default LeaderboardModal;
 
