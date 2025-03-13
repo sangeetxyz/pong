@@ -95,11 +95,8 @@ const Wallet = () => {
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   useEffect(() => {
-    const refetch = async () => {
-      await refetchUserDetails();
-      await refetchTokenBalance();
-    };
-    refetch();
+    void refetchUserDetails();
+    void refetchTokenBalance();
   }, [isOpen, refetchUserDetails, refetchTokenBalance]);
 
   return (
