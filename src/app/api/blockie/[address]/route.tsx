@@ -2,7 +2,7 @@ import type { NextRequest } from "next/server";
 import makeBlockie from "ethereum-blockies-base64";
 import { Buffer } from "node:buffer";
 
-export const runtime = "edge";
+export const runtime = "node";
 
 function isValidEthereumAddress(address: string): boolean {
   return /^0x[a-fA-F0-9]{40}$/.test(address);

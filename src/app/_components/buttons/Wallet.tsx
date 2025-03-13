@@ -21,7 +21,7 @@ import {
   DialogTitle,
 } from "@/app/_components/ui/dialog";
 import { useReadContract } from "wagmi";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { formatEther, type Address } from "viem";
 import { getSession, useSession } from "next-auth/react";
 import Image from "next/image";
@@ -40,7 +40,8 @@ const Wallet = () => {
   const { signMessageAsync } = useSignMessage();
   const [isOpen, setIsOpen] = useState(false);
   const { disconnectAsync } = useDisconnect();
-  const { data: userDetails } = api.token.getUserDetails.useQuery();
+  const { data: userDetails, refetch: refetchUserDetails } =
+    api.token.getUserDetails.useQuery();
 
   const { data: tokenBalance, refetch: refetchTokenBalance } = useReadContract({
     abi: PongTokenABI,
@@ -91,6 +92,12 @@ const Wallet = () => {
     await getSession();
     setIsOpen(false);
   };
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
+  useEffect(() => {
+    refetchUserDetails();
+    refetchTokenBalance();
+  }, [isOpen, refetchUserDetails, refetchTokenBalance]);
 
   return (
     <div>

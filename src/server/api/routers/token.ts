@@ -58,7 +58,6 @@ export const tokenRouter = createTRPCRouter({
       where: (leaderboard, { eq }) =>
         eq(leaderboard.walletAddress, ctx.session.user.id),
     });
-    console.log(data);
     return data;
   }),
   getLeaderboardDetails: publicProcedure.query(async ({ ctx }) => {
