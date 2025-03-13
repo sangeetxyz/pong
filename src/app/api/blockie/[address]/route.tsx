@@ -8,11 +8,7 @@ function isValidEthereumAddress(address: string): boolean {
 
 export async function GET(request: NextRequest): Promise<Response> {
   try {
-    // Parse the URL.
     const url = new URL(request.url);
-    // Split the pathname and grab the last segment.
-    // For a route file at /api/blockie/[address]/route.ts,
-    // the address should be the last segment.
     const segments = url.pathname.split("/");
     const address = segments[segments.length - 1];
 
