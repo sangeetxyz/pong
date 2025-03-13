@@ -45,7 +45,7 @@ const GameModal = memo(() => {
           )}
 
           {hasScore && (
-            <div className="flex flex-col place-items-baseline space-y-1">
+            <div className="mt-4 flex flex-col place-items-baseline space-y-1">
               <div className="bg-gradient-to-r from-lime-500 to-lime-300 bg-clip-text text-7xl font-extrabold text-transparent">
                 {formatLargeNumber(Math.floor(score))}
               </div>
