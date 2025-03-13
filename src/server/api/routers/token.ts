@@ -7,7 +7,7 @@ import {
 import { env } from "@/env";
 import { leaderboard } from "@/server/db/schema";
 import { sql } from "drizzle-orm";
-import { getBalance } from "@/server/web3";
+import { getBalance, rewardUser } from "@/server/web3";
 
 export const tokenRouter = createTRPCRouter({
   get: protectedProcedure
@@ -27,9 +27,9 @@ export const tokenRouter = createTRPCRouter({
           success: false,
           message: `Score atleast ${env.NEXT_PUBLIC_MINIMUM_SCORE} to get reward.`,
         };
-      // const rewardResult = await rewardUser(ctx.session.user.id, input.score);
-      // if (!rewardResult)
-      //   return { success: false, message: "Reward failed. Please try again." };
+      const rewardResult = await rewardUser(ctx.session.user.id, input.score);
+      if (!rewardResult)
+        return { success: false, message: "Reward failed. Please try again." };
       const currentScore = Math.floor(input.score);
       const survivalTime = Math.floor((input.endTime - input.startTime) / 1000);
       const pongTokenCount = await getBalance(ctx.session.user.id);
