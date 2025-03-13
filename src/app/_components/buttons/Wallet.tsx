@@ -21,7 +21,7 @@ import {
   DialogTitle,
 } from "@/app/_components/ui/dialog";
 import { useReadContract } from "wagmi";
-import { memo, useEffect, useState } from "react";
+import { type FC, memo, useEffect, useState } from "react";
 import { formatEther, type Address } from "viem";
 import { getSession, useSession } from "next-auth/react";
 import Image from "next/image";
@@ -32,7 +32,11 @@ import { api } from "@/trpc/react";
 
 const message = env.NEXT_PUBLIC_SIGN_MESSAGE;
 
-const Wallet = memo(() => {
+type TWalletProps = {
+  className?: string;
+};
+
+const Wallet: FC<TWalletProps> = memo(({ className }) => {
   const { authState, setAuthState, user } = useAuth();
   const { update } = useSession();
   const { address } = useAppKitAccount();
@@ -78,7 +82,7 @@ const Wallet = memo(() => {
       case EAuthState.SIGNING:
         return "Signing...";
       case EAuthState.SIGNED:
-        return truncateAddress(user?.id);
+        return user ? truncateAddress(user.id) : "Loading...";
       case EAuthState.ERROR:
         return "Error";
       default:
@@ -100,11 +104,15 @@ const Wallet = memo(() => {
   }, [isOpen, refetchUserDetails, refetchTokenBalance]);
 
   return (
-    <div>
-      <Button variant={"secondary"} className="" onClick={handleClick}>
+    <>
+      <Button
+        className={cn(className)}
+        variant={authState === EAuthState.SIGNED ? "secondary" : "default"}
+        onClick={handleClick}
+      >
         <SiWalletconnect
           className={cn({
-            "text-lime-400": authState === EAuthState.SIGNED,
+            "text-lime-500": authState === EAuthState.SIGNED,
           })}
         />
         {buttonText()}
@@ -140,7 +148,7 @@ const Wallet = memo(() => {
                   {truncateAddress(user.id)}
                   <CopyButton
                     text={user.id}
-                    className="absolute -right-6 top-1"
+                    className="absolute -right-6 top-2"
                   />
                 </div>
                 {tokenBalance && (
@@ -176,7 +184,7 @@ const Wallet = memo(() => {
           </DialogContent>
         </Dialog>
       )}
-    </div>
+    </>
   );
 });
 

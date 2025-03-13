@@ -37,7 +37,7 @@ const MusicButton = memo(() => {
     let currentVolume = start;
 
     fadeInterval.current = setInterval(() => {
-      currentStep++;
+      currentStep = currentStep + 1;
       currentVolume += volumeStep;
 
       if (

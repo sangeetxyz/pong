@@ -101,7 +101,7 @@ const LeaderboardTable: FC<TLeaderboardTableProps> = ({ data }) => {
                 {formatLargeNumber(row.highScore)}
               </TableCell>
               <TableCell className="pr-4 text-end text-xs">
-                {row.pongTokenCount}
+                {formatLargeNumber(row.pongTokenCount)}
               </TableCell>
             </TableRow>
           ))}

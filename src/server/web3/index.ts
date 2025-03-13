@@ -8,10 +8,7 @@ import {
   http,
   getContract,
   type Address,
-  parseEther,
-  parseUnits,
   formatUnits,
-  // waitForTransactionReceipt,
 } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { waitForTransactionReceipt } from "viem/actions";

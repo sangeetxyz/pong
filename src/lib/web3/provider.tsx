@@ -1,8 +1,8 @@
 "use client";
 
-import { wagmiAdapter, projectId, networks } from "@/lib/web3/config";
+import { wagmiAdapter, projectId } from "@/lib/web3/config";
 import { createAppKit } from "@reown/appkit/react";
-import { mainnet, arbitrum, huddle01Testnet } from "@reown/appkit/networks";
+import { mainnet, huddle01Testnet } from "@reown/appkit/networks";
 import React, { type ReactNode } from "react";
 import { cookieToInitialState, WagmiProvider } from "wagmi";
 import { TRPCReactProvider } from "@/trpc/react";

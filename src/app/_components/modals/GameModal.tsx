@@ -12,6 +12,7 @@ import { RiPingPongLine } from "react-icons/ri";
 import { useProgress } from "@react-three/drei";
 import useAuth from "@/hooks/useAuth";
 import { formatLargeNumber } from "@/lib/utils";
+import Wallet from "../buttons/Wallet";
 
 const GameModal = memo(() => {
   const { startGame, score, isOpen, explore, multiplier, isLoading } =
@@ -25,7 +26,7 @@ const GameModal = memo(() => {
     <Dialog open={isOpen && !active}>
       <DialogContent
         disableX
-        className="w-96 rounded-3xl bg-zinc-950/50 p-6 shadow-xl backdrop-blur-md"
+        className="hidden w-96 rounded-3xl bg-zinc-950/50 p-6 shadow-xl backdrop-blur-md md:block"
       >
         <DialogHeader>
           <DialogTitle className="text-center text-2xl font-bold text-white">
@@ -62,19 +63,23 @@ const GameModal = memo(() => {
               variant={"secondary"}
               className="w-full rounded-xl"
             >
-              Go Back
+              Explore
             </Button>
-            <Button
-              disabled={isLoading || !user}
-              onClick={startGame}
-              className="w-full rounded-xl"
-            >
-              {isLoading
-                ? "Validating Score..."
-                : hasScore
-                  ? "Restart Game"
-                  : "Start Game"}
-            </Button>
+            {user ? (
+              <Button
+                disabled={isLoading}
+                onClick={startGame}
+                className="w-full rounded-xl"
+              >
+                {isLoading
+                  ? "Validating Score..."
+                  : hasScore
+                    ? "Restart Game"
+                    : "Start Game"}
+              </Button>
+            ) : (
+              <Wallet className="w-full" />
+            )}
           </div>
         </div>
       </DialogContent>

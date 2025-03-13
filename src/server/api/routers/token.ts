@@ -7,7 +7,7 @@ import {
 import { env } from "@/env";
 import { leaderboard } from "@/server/db/schema";
 import { sql } from "drizzle-orm";
-import { getBalance, rewardUser } from "@/server/web3";
+import { getBalance } from "@/server/web3";
 
 export const tokenRouter = createTRPCRouter({
   get: protectedProcedure
@@ -81,6 +81,18 @@ const isValidGameData = (data: TIsValidGameData): boolean => {
     console.error("Invalid timestamps: startTime must be less than endTime");
     return false;
   }
+
+  const now = Date.now();
+  const MAX_MS = 1000;
+  if (now - data.endTime > MAX_MS) {
+    console.error(
+      `endTime ${data.endTime} is too old. The difference is ${
+        now - data.endTime
+      } ms, exceeding ${MAX_MS} ms.`,
+    );
+    return false;
+  }
+
   const MULTIPLIER_GROWTH_RATE = Number(env.MULTIPLIER_GROWTH_RATE);
   const MAX_BOUNCES_PER_SECOND = Number(env.MAX_BOUNCES_PER_SECOND);
 

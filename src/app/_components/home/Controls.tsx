@@ -13,7 +13,7 @@ const Controls = memo(() => {
   const { user } = useAuth();
   return (
     <div className="absolute bottom-4 left-1/2 flex -translate-x-1/2 transform items-center space-x-2 rounded-2xl border border-zinc-700 bg-zinc-950/30 p-2 backdrop-blur-md">
-      <div className="px-2 font-bold italic">
+      <div className="px-2 text-lg font-bold italic">
         Pong<span className="text-lime-400">01</span>
       </div>
       <Button
