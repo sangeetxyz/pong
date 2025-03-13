@@ -1,35 +1,25 @@
-export interface BlockieImageProps {
-  address?: string;
-  size?: number;
-  className?: string;
-}
-
 import type { NextRequest } from "next/server";
 import makeBlockie from "ethereum-blockies-base64";
+import { Buffer } from "node:buffer";
 
 export const runtime = "edge";
-
-interface RouteParams {
-  params: {
-    address: string;
-  };
-}
 
 function isValidEthereumAddress(address: string): boolean {
   return /^0x[a-fA-F0-9]{40}$/.test(address);
 }
 
-export async function GET(
-  _request: NextRequest,
-  { params }: RouteParams,
-): Promise<Response> {
+export async function GET(request: NextRequest): Promise<Response> {
   try {
-    const { address } = params;
+    // Parse the URL.
+    const url = new URL(request.url);
+    // Split the pathname and grab the last segment.
+    // For a route file at /api/blockie/[address]/route.ts,
+    // the address should be the last segment.
+    const segments = url.pathname.split("/");
+    const address = segments[segments.length - 1];
 
     if (!address || !isValidEthereumAddress(address)) {
-      return new Response("Invalid Ethereum address", {
-        status: 400,
-      });
+      return new Response("Invalid Ethereum address", { status: 400 });
     }
 
     const blockieBase64: string = makeBlockie(address);
@@ -47,8 +37,6 @@ export async function GET(
     });
   } catch (e) {
     console.error(e);
-    return new Response("Failed to generate the image", {
-      status: 500,
-    });
+    return new Response("Failed to generate the image", { status: 500 });
   }
 }

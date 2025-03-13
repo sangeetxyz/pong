@@ -16,7 +16,7 @@ const CopyButton = ({
       type="button"
       className={cn(className, "focus:outline-none")}
       onClick={() => {
-        navigator.clipboard.writeText(text);
+        void navigator.clipboard.writeText(text);
         setIsCopied(true);
         setTimeout(() => setIsCopied(false), 5000);
       }}

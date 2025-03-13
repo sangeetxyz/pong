@@ -45,7 +45,8 @@ const MusicButton = memo(() => {
         (volumeStep < 0 && currentVolume <= end)
       ) {
         currentVolume = end;
-        clearInterval(fadeInterval.current as NodeJS.Timeout);
+        // biome-ignore lint/style/noNonNullAssertion: <explanation>
+        clearInterval(fadeInterval.current!);
         fadeInterval.current = null;
 
         if (end === 0) {
