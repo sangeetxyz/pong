@@ -119,12 +119,12 @@ const Wallet: FC<TWalletProps> = memo(({ className }) => {
       </Button>
       {user?.id && (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
-          <DialogContent className="w-96">
+          <DialogContent className="w-96 bg-zinc-950/50 p-4 backdrop-blur-lg">
             <DialogHeader className="hidden">
               <DialogTitle>{}</DialogTitle>
               <DialogDescription>{}</DialogDescription>
             </DialogHeader>
-            <div className="flex flex-col space-y-6">
+            <div className="flex flex-col space-y-4">
               <div className="relative flex justify-start">
                 <Image
                   src={"/hud.png"}
@@ -159,7 +159,7 @@ const Wallet: FC<TWalletProps> = memo(({ className }) => {
                 )}
               </div>
               {userDetails && (
-                <div className="flex space-x-6">
+                <div className="flex space-x-4">
                   <div className="flex w-full flex-col items-center space-y-1 rounded-2xl border bg-zinc-900 p-2">
                     <div className="whitespace-nowrap text-xs text-zinc-400">
                       Highest Score

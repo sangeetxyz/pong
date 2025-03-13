@@ -40,7 +40,7 @@ const LeaderboardModal = memo(() => {
           <MdLeaderboard className="" />
         </Button>
       </DialogTrigger>
-      <DialogContent className="p-2">
+      <DialogContent className="bg-zinc-950/50 p-2 backdrop-blur-lg">
         <DialogHeader className="hidden">
           <DialogTitle>{}</DialogTitle>
           <DialogDescription>{}</DialogDescription>
