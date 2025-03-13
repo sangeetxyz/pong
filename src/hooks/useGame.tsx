@@ -2,7 +2,7 @@ import { useGameAtom } from "@/atoms/game.atom";
 import { getToken } from "@/lib/action";
 import { calculateScore, getScoreMultiplier } from "@/lib/utils";
 import { clamp } from "lodash-es";
-import  { useCallback } from "react";
+import { useCallback } from "react";
 import { toast } from "sonner";
 
 const createAudio = (src: string): HTMLAudioElement => {

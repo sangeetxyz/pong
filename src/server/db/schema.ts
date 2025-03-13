@@ -1,8 +1,8 @@
 import { relations, sql } from "drizzle-orm";
 import {
+  bigint,
   index,
   integer,
-  numeric,
   pgTableCreator,
   primaryKey,
   text,
@@ -112,15 +112,9 @@ export const leaderboard = createTable("leaderboard", {
   walletAddress: varchar("wallet_address", { length: 42 })
     .notNull()
     .primaryKey(),
-  highScore: numeric("high_score", { precision: 50, scale: 0 }).notNull(),
-  longestSurvival: numeric("longest_survival", {
-    precision: 50,
-    scale: 0,
-  }).notNull(),
-  pongTokenCount: numeric("pong_token_count", {
-    precision: 50,
-    scale: 0,
-  }).notNull(),
+  highScore: bigint("high_score", { mode: "number" }).notNull(),
+  longestSurvival: bigint("longest_survival", { mode: "number" }).notNull(),
+  pongTokenCount: bigint("pong_token_count", { mode: "number" }).notNull(),
   createdAt: timestamp("created_at", { withTimezone: true })
     .notNull()
     .default(sql`CURRENT_TIMESTAMP`),

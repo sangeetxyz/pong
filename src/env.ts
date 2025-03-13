@@ -22,7 +22,6 @@ export const env = createEnv({
     MULTIPLIER_GROWTH_RATE: z.string(),
     MAX_BOUNCES_PER_SECOND: z.string(),
     RPC_URL: z.string(),
-    PONGTOKEN_ADDRESS: z.string(),
   },
 
   /**
@@ -36,6 +35,7 @@ export const env = createEnv({
     NEXT_PUBLIC_SIGN_MESSAGE: z.string(),
     NEXT_PUBLIC_MULTIPLIER_GROWTH_RATE: z.string(),
     NEXT_PUBLIC_MINIMUM_SCORE: z.string(),
+    NEXT_PUBLIC_PONGTOKEN_ADDRESS: z.string(),
   },
 
   /**
@@ -57,7 +57,7 @@ export const env = createEnv({
       process.env.NEXT_PUBLIC_MULTIPLIER_GROWTH_RATE,
     MAX_BOUNCES_PER_SECOND: process.env.MAX_BOUNCES_PER_SECOND,
     RPC_URL: process.env.RPC_URL,
-    PONGTOKEN_ADDRESS: process.env.PONGTOKEN_ADDRESS,
+    NEXT_PUBLIC_PONGTOKEN_ADDRESS: process.env.NEXT_PUBLIC_PONGTOKEN_ADDRESS,
     NEXT_PUBLIC_MINIMUM_SCORE: process.env.NEXT_PUBLIC_MINIMUM_SCORE,
   },
   /**

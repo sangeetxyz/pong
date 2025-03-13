@@ -32,3 +32,59 @@ export function calculateScore(count: number, basePoints = 1) {
 
 export const wait = (ms: number) =>
   new Promise((resolve) => setTimeout(resolve, ms));
+
+export const formatTime = (ms: number) => {
+  // Convert ms to total seconds
+  const totalSeconds = Math.floor(ms / 1000);
+  // Get minutes and seconds
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  // Return in mm:ss format
+  return `${minutes.toString().padStart(2, "0")}:${seconds
+    .toString()
+    .padStart(2, "0")}`;
+};
+
+export const formatSeconds = (totalSeconds: number): string => {
+  const hrs = Math.floor(totalSeconds / 3600);
+  const mins = Math.floor((totalSeconds % 3600) / 60);
+  const secs = Math.floor(totalSeconds % 60);
+
+  let formatted = "";
+  if (hrs > 0) {
+    formatted += `${hrs}h `;
+  }
+  if (mins > 0 || hrs > 0) {
+    formatted += `${mins}m `;
+  }
+  formatted += `${secs}s`;
+  return formatted.trim();
+};
+
+export function formatLargeNumber(input: number, noPadding?: boolean): string {
+  const num = input;
+  const absNum = Math.abs(num);
+
+  if (absNum < 1_000) {
+    const n = Math.floor(num).toString();
+    return noPadding ? n : n.padStart(2, "0");
+  }
+
+  if (absNum < 1_000_000) {
+    const truncated = Math.floor((num / 1_000) * 10) / 10;
+    return `${truncated}K`;
+  }
+
+  if (absNum < 1_000_000_000) {
+    const truncated = Math.floor((num / 1_000_000) * 10) / 10;
+    return `${truncated}M`;
+  }
+
+  if (absNum < 1_000_000_000_000) {
+    const truncated = Math.floor((num / 1_000_000_000) * 10) / 10;
+    return `${truncated}B`;
+  }
+
+  const truncated = Math.floor((num / 1_000_000_000_000) * 10) / 10;
+  return `${truncated}T`;
+}

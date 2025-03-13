@@ -6,7 +6,13 @@ import { useDisconnect, useSignMessage } from "wagmi";
 import { env } from "@/env";
 import useAuth, { EAuthState } from "@/hooks/useAuth";
 import { login, logout } from "@/lib/action";
-import { truncateAddress } from "@/lib/utils";
+import {
+  cn,
+  formatLargeNumber,
+  formatSeconds,
+  truncateAddress,
+} from "@/lib/utils";
+import { SiWalletconnect } from "react-icons/si";
 import {
   Dialog,
   DialogContent,
@@ -14,9 +20,15 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/app/_components/ui/dialog";
+import { useReadContract } from "wagmi";
 import { useState } from "react";
-import type { Address } from "viem";
+import { formatEther, type Address } from "viem";
 import { getSession, useSession } from "next-auth/react";
+import Image from "next/image";
+import CopyButton from "./CopyButton";
+import { PongTokenABI } from "@/common/abis";
+import { huddle01Testnet } from "viem/chains";
+import { api } from "@/trpc/react";
 
 const message = env.NEXT_PUBLIC_SIGN_MESSAGE;
 
@@ -28,6 +40,15 @@ const Wallet = () => {
   const { signMessageAsync } = useSignMessage();
   const [isOpen, setIsOpen] = useState(false);
   const { disconnectAsync } = useDisconnect();
+  const { data: userDetails } = api.token.getUserDetails.useQuery();
+
+  const { data: tokenBalance, refetch: refetchTokenBalance } = useReadContract({
+    abi: PongTokenABI,
+    address: env.NEXT_PUBLIC_PONGTOKEN_ADDRESS as Address,
+    functionName: "balanceOf",
+    args: user ? [user.id] : undefined,
+    chainId: huddle01Testnet.id,
+  });
 
   const handleClick = async () => {
     if (!address && !user?.id) return open({ view: "Connect" });
@@ -60,7 +81,7 @@ const Wallet = () => {
       case EAuthState.ERROR:
         return "Error";
       default:
-        return null;
+        return "Loading...";
     }
   };
 
@@ -74,23 +95,80 @@ const Wallet = () => {
   return (
     <div>
       <Button variant={"secondary"} className="" onClick={handleClick}>
+        <SiWalletconnect
+          className={cn({
+            "text-lime-400": authState === EAuthState.SIGNED,
+          })}
+        />
         {buttonText()}
       </Button>
-      <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Are you absolutely sure?</DialogTitle>
-            <DialogDescription>
-              This action cannot be undone. This will permanently delete your
-              account and remove your data from our servers.
-            </DialogDescription>
-          </DialogHeader>
-          <div>
-            <Button onClick={handleDisconnect}>Disconnect</Button>
-            <div>{user?.id}</div>
-          </div>
-        </DialogContent>
-      </Dialog>
+      {user?.id && (
+        <Dialog open={isOpen} onOpenChange={setIsOpen}>
+          <DialogContent className="w-96">
+            <DialogHeader className="hidden">
+              <DialogTitle>{}</DialogTitle>
+              <DialogDescription>{}</DialogDescription>
+            </DialogHeader>
+            <div className="flex flex-col space-y-6">
+              <div className="relative flex justify-start">
+                <Image
+                  src={"/hud.png"}
+                  alt=""
+                  height={50}
+                  width={40}
+                  className="h-6 object-contain"
+                />
+              </div>
+              <div className="flex flex-col items-center space-y-2">
+                <div className="mb-2 size-24 rounded-full border p-1">
+                  <Image
+                    src={`/api/blockie/${user.id}`}
+                    alt=""
+                    height={500}
+                    width={500}
+                    className="rounded-full object-contain"
+                  />
+                </div>
+                <div className="relative text-xl font-bold text-zinc-300">
+                  {truncateAddress(user.id)}
+                  <CopyButton
+                    text={user.id}
+                    className="absolute -right-6 top-1"
+                  />
+                </div>
+                {tokenBalance && (
+                  <div className="text-xs">
+                    {formatEther(tokenBalance)}{" "}
+                    <span className="text-lime-400">$PONG</span>
+                  </div>
+                )}
+              </div>
+              {userDetails && (
+                <div className="flex space-x-6">
+                  <div className="flex w-full flex-col items-center space-y-1 rounded-2xl border bg-zinc-900 p-2">
+                    <div className="whitespace-nowrap text-xs text-zinc-400">
+                      Highest Score
+                    </div>
+                    <div className="text-xl font-bold text-lime-400">
+                      {formatLargeNumber(userDetails.highScore)}
+                    </div>
+                  </div>
+                  <div className="flex w-full flex-col items-center space-y-1 rounded-2xl border bg-zinc-900 p-2">
+                    <div className="whitespace-nowrap text-xs text-zinc-400">
+                      Longest Survival
+                    </div>
+                    <div className="text-center text-xl font-bold text-lime-400">
+                      {formatSeconds(userDetails.longestSurvival)}
+                    </div>
+                  </div>
+                </div>
+              )}
+              <Button onClick={handleDisconnect}>Disconnect</Button>
+              {/* <div>{user?.id}</div> */}
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 };

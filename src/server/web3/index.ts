@@ -19,7 +19,7 @@ import { huddle01Testnet } from "viem/chains";
 
 const rpcUrl = env.RPC_URL;
 const serverPrivateKey = env.PRIVATE_KEY as Address;
-const pongTokenAddress = env.PONGTOKEN_ADDRESS as Address;
+const pongTokenAddress = env.NEXT_PUBLIC_PONGTOKEN_ADDRESS as Address;
 
 const publicClient = createPublicClient({
   chain: huddle01Testnet,

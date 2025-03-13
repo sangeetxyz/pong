@@ -1,5 +1,9 @@
 import { z } from "zod";
-import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
+import {
+  createTRPCRouter,
+  protectedProcedure,
+  publicProcedure,
+} from "@/server/api/trpc";
 import { env } from "@/env";
 import { leaderboard } from "@/server/db/schema";
 import { sql } from "drizzle-orm";
@@ -29,26 +33,41 @@ export const tokenRouter = createTRPCRouter({
       const currentScore = Math.floor(input.score);
       const survivalTime = Math.floor((input.endTime - input.startTime) / 1000);
       const pongTokenCount = await getBalance(ctx.session.user.id);
-      const a = await ctx.db
+      await ctx.db
         .insert(leaderboard)
         .values({
           walletAddress: ctx.session.user.id,
-          highScore: currentScore.toString(),
-          longestSurvival: survivalTime.toString(),
-          pongTokenCount: pongTokenCount.toString(),
+          highScore: currentScore,
+          longestSurvival: survivalTime,
+          pongTokenCount: pongTokenCount,
         })
         .onConflictDoUpdate({
           target: [leaderboard.walletAddress],
           set: {
             highScore: sql`GREATEST(${leaderboard.highScore}, ${currentScore})`,
             longestSurvival: sql`GREATEST(${leaderboard.longestSurvival}, ${survivalTime})`,
-            pongTokenCount: sql`GREATEST(${leaderboard.pongTokenCount}, ${pongTokenCount})`,
+            pongTokenCount,
             updatedAt: sql`CURRENT_TIMESTAMP`,
           },
         });
 
       return { success: true, message: "Reward credited successfully!" };
     }),
+  getUserDetails: protectedProcedure.query(async ({ ctx }) => {
+    const data = await ctx.db.query.leaderboard.findFirst({
+      where: (leaderboard, { eq }) =>
+        eq(leaderboard.walletAddress, ctx.session.user.id),
+    });
+    console.log(data);
+    return data;
+  }),
+  getLeaderboardDetails: publicProcedure.query(async ({ ctx }) => {
+    const data = await ctx.db.query.leaderboard.findMany({
+      orderBy: (data, { asc }) => [asc(data.pongTokenCount)],
+      limit: 10,
+    });
+    return data;
+  }),
 });
 
 type TIsValidGameData = {
