@@ -25,6 +25,9 @@ const Paddle = memo(({ position }: TPaddleProps) => {
   const dirVec = useRef(new THREE.Vector3());
   const rotationQuat = useRef(new THREE.Quaternion());
 
+  const prevPosition = useRef(new THREE.Vector3());
+  const currentPosition = useRef(new THREE.Vector3());
+
   const contactForce = useCallback(
     (payload: { totalForceMagnitude: number }) => {
       pong(payload.totalForceMagnitude / 100);
@@ -38,46 +41,42 @@ const Paddle = memo(({ position }: TPaddleProps) => {
   useFrame((state, delta) => {
     const { camera, pointer } = state;
 
-    let pointerX = pointer.x;
-    let pointerY = pointer.y;
+    // Store previous position
+    prevPosition.current.copy(currentPosition.current);
 
-    if (pointerX < -1) pointerX = -1;
-    else if (pointerX > 1) pointerX = 1;
+    // Your existing pointer clamping
+    const pointerX = THREE.MathUtils.clamp(pointer.x, -1, 1);
+    const pointerY = THREE.MathUtils.clamp(pointer.y, -1, 1);
 
-    if (pointerY < -1) pointerY = -1;
-    else if (pointerY > 1) pointerY = 1;
-
-    // Reuse existing vectors rather than recreating each frame
+    // Your existing target calculation
     targetVec.current.set(pointerX, pointerY, 0.5);
     targetVec.current.unproject(camera);
-
     dirVec.current.subVectors(targetVec.current, camera.position).normalize();
     targetVec.current
       .copy(camera.position)
       .addScaledVector(dirVec.current, camera.position.length());
 
-    // Update physics only if position/rotation changed significantly
+    // Update current target position
+    currentPosition.current.set(targetVec.current.x, targetVec.current.y, 0);
+
+    // Create interpolated position
+    const interpPosition = new THREE.Vector3();
+    interpPosition
+      .copy(prevPosition.current)
+      .lerp(currentPosition.current, 0.7);
+
     if (physicsBody.current) {
-      // Cache previous position to avoid unnecessary updates
-      const currentPos = physicsBody.current.translation();
       const targetPos = {
-        x: targetVec.current.x,
-        y: targetVec.current.y,
+        x: interpPosition.x,
+        y: interpPosition.y,
         z: 0,
       };
 
-      // Only update position if it changed significantly
-      if (
-        Math.abs(currentPos.x - targetPos.x) > 0.001 ||
-        Math.abs(currentPos.y - targetPos.y) > 0.001
-      ) {
-        physicsBody.current.setNextKinematicTranslation(targetPos);
-      }
+      physicsBody.current.setNextKinematicTranslation(targetPos);
 
-      // Calculate rotation only when needed
+      // Existing rotation code
       const angle = (pointerX * Math.PI) / 5;
       rotationQuat.current.setFromAxisAngle(new THREE.Vector3(0, 0, 1), angle);
-
       physicsBody.current.setNextKinematicRotation(rotationQuat.current);
     }
 
@@ -101,6 +100,10 @@ const Paddle = memo(({ position }: TPaddleProps) => {
       colliders={false}
       onContactForce={contactForce}
       position={position}
+      linearDamping={5}
+      angularDamping={5}
+      friction={0.7}
+      restitution={0.2}
     >
       <CylinderCollider args={[0.15, 1.75]} />
       <group ref={model} position={[0, 2, 0]} scale={0.15}>

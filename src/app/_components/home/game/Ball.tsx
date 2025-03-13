@@ -10,10 +10,16 @@ type TBallProps = {
 };
 
 const Ball = memo(({ position = [0, 5, 0] }: TBallProps) => {
+  const weight = 1;
   const api = useRef<React.ComponentRef<typeof RigidBody>>(null);
   const map = useTexture("/crossp.jpg");
   const { endGame } = useGame();
   const { viewport } = useThree();
+
+  const ballMass = weight;
+  const linearDamping = weight * 0.5;
+  const restitution = Math.max(0.5, 1.0 / weight);
+  const gravityScale = 1 + (weight - 1) * 0.2;
 
   const onCollisionEnter = useCallback(async () => {
     await endGame();
@@ -28,8 +34,11 @@ const Ball = memo(({ position = [0, 5, 0] }: TBallProps) => {
       <RigidBody
         ccd
         ref={api}
+        mass={ballMass}
+        linearDamping={linearDamping}
+        restitution={restitution}
+        gravityScale={gravityScale}
         angularDamping={0.8}
-        restitution={1}
         canSleep={false}
         colliders={false}
         enabledTranslations={[true, true, false]}
