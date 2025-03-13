@@ -18,7 +18,9 @@ const useGame = () => {
       const ping = createAudio("/ping.mp3");
       ping.currentTime = 0;
       ping.volume = clamp(velocity / 20, 0, 1);
-        ping.play().catch(() => {});
+      ping.play().catch((e) => {
+        console.error(e);
+      });
 
       // Update score if velocity is high enough
       if (velocity > 10) {
