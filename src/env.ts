@@ -20,6 +20,7 @@ export const env = createEnv({
     MULTIPLIER_GROWTH_RATE: z.string(),
     MAX_BOUNCES_PER_SECOND: z.string(),
     RPC_URL: z.string(),
+    MAX_MS: z.string(),
   },
 
   /**
@@ -55,6 +56,7 @@ export const env = createEnv({
     RPC_URL: process.env.RPC_URL,
     NEXT_PUBLIC_PONGTOKEN_ADDRESS: process.env.NEXT_PUBLIC_PONGTOKEN_ADDRESS,
     NEXT_PUBLIC_MINIMUM_SCORE: process.env.NEXT_PUBLIC_MINIMUM_SCORE,
+    MAX_MS: process.env.MAX_MS,
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially
