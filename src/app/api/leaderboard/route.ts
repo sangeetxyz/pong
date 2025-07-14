@@ -35,11 +35,11 @@ export async function GET(req: NextRequest) {
       ]);
     }
 
-    const top10 = await db
-      .select()
-      .from(leaderboard)
-      .orderBy(desc(leaderboard.pongTokenCount))
-      .limit(10);
+    const top10 = allEntries.slice(0, 10).map((entry, index) => ({
+      rank: index + 1,
+      score: entry.pongTokenCount,
+      walletAddress: entry.walletAddress,
+    }));
 
     return NextResponse.json(top10);
   } catch (error) {
