@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Sheet,
   SheetContent,
@@ -14,15 +14,16 @@ import { Share2, Gift, Clock } from "lucide-react";
 const Refer = () => {
   const { referralStats, shareReferralLink, refetchReferralStats } =
     useReferral();
+  const [open, setOpen] = useState(false);
 
   useEffect(() => {
     void refetchReferralStats();
-  }, [refetchReferralStats]);
+  }, [refetchReferralStats, open]);
 
   if (!referralStats) return null;
 
   return (
-    <Sheet>
+    <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger>
         <div className="absolute bottom-4 right-4 flex cursor-pointer items-center space-x-1 rounded-xl bg-zinc-950/30 px-3 py-2 backdrop-blur-lg">
           <div className="text-xs">
@@ -110,8 +111,8 @@ const Refer = () => {
                 Pending Referrals
               </div>
               <div className="text-sm text-orange-600">
-                {referralStats.pendingReferrals} user(s) signed up but haven&apos;t
-                played their first game yet.
+                {referralStats.pendingReferrals} user(s) signed up but
+                haven&apos;t played their first game yet.
               </div>
             </div>
           )}
