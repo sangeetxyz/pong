@@ -19,7 +19,7 @@ const useGame = () => {
 
   useEffect(() => {
     if (session?.user) {
-      processPendingReferral();
+      void processPendingReferral();
     }
   }, [session?.user, processPendingReferral]);
 

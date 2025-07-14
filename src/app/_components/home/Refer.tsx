@@ -110,7 +110,7 @@ const Refer = () => {
                 Pending Referrals
               </div>
               <div className="text-sm text-orange-600">
-                {referralStats.pendingReferrals} user(s) signed up but haven't
+                {referralStats.pendingReferrals} user(s) signed up but haven&apos;t
                 played their first game yet.
               </div>
             </div>

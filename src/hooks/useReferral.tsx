@@ -31,7 +31,7 @@ export const useReferral = () => {
   }, []);
 
   const processPendingReferral = useCallback(async () => {
-    if (!user || !user.id) return;
+    if (!user?.id) return;
     const pendingReferral = localStorage.getItem("pendingReferral");
 
     if (!pendingReferral || addReferralMutation.isPending) return;
