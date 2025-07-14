@@ -45,7 +45,10 @@ const Wallet: FC<TWalletProps> = memo(({ className }) => {
   const [isOpen, setIsOpen] = useState(false);
   const { disconnectAsync } = useDisconnect();
   const { data: userDetails, refetch: refetchUserDetails } =
-    api.token.getUserDetails.useQuery();
+    api.token.getUserDetails.useQuery(undefined, {
+      enabled: !!user?.id,
+      refetchOnWindowFocus: false,
+    });
 
   const { data: tokenBalance, refetch: refetchTokenBalance } = useReadContract({
     abi: PongTokenABI,
@@ -151,7 +154,7 @@ const Wallet: FC<TWalletProps> = memo(({ className }) => {
                     className="absolute -right-6 top-2"
                   />
                 </div>
-                {tokenBalance && (
+                {!!tokenBalance && (
                   <div className="rounded-2xl border bg-zinc-900 px-3 py-1 text-xs">
                     {formatEther(tokenBalance)}{" "}
                     <span className="text-lime-400">$PONG</span>

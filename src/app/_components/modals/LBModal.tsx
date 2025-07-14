@@ -19,13 +19,18 @@ import {
 } from "@/app/_components/ui/dialog";
 import { api } from "@/trpc/react";
 import { formatLargeNumber, formatSeconds, truncateAddress } from "@/lib/utils";
+import useAuth from "@/hooks/useAuth";
 
 const LeaderboardModal = memo(() => {
-  const { data, refetch } = api.token.getLeaderboardDetails.useQuery();
+  const { user } = useAuth();
+  const { data, refetch } = api.token.getLeaderboardDetails.useQuery(
+    undefined,
+    { enabled: !!user?.id },
+  );
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    if (open) {
+    if (open && !!user?.id) {
       void refetch();
     }
   }, [open, refetch]);

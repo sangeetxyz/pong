@@ -1,6 +1,7 @@
 import { relations, sql } from "drizzle-orm";
 import {
   bigint,
+  boolean,
   index,
   integer,
   pgTableCreator,
@@ -9,7 +10,6 @@ import {
   timestamp,
   varchar,
 } from "drizzle-orm/pg-core";
-import type { AdapterAccount } from "next-auth/adapters";
 
 /**
  * This is an example of how to use the multi-project schema feature of Drizzle ORM. Use the same
@@ -19,92 +19,36 @@ import type { AdapterAccount } from "next-auth/adapters";
  */
 export const createTable = pgTableCreator((name) => `pong_${name}`);
 
-export const users = createTable("user", {
-  id: varchar("id", { length: 255 })
-    .notNull()
-    .primaryKey()
-    .$defaultFn(() => crypto.randomUUID()),
-  name: varchar("name", { length: 255 }),
-  email: varchar("email", { length: 255 }).notNull(),
-  emailVerified: timestamp("email_verified", {
-    mode: "date",
-    withTimezone: true,
-  }).default(sql`CURRENT_TIMESTAMP`),
-  image: varchar("image", { length: 255 }),
-});
-
-export const usersRelations = relations(users, ({ many }) => ({
-  accounts: many(accounts),
-}));
-
-export const accounts = createTable(
-  "account",
+export const referrals = createTable(
+  "referral",
   {
-    userId: varchar("user_id", { length: 255 })
+    id: varchar("id", { length: 255 })
       .notNull()
-      .references(() => users.id),
-    type: varchar("type", { length: 255 })
-      .$type<AdapterAccount["type"]>()
-      .notNull(),
-    provider: varchar("provider", { length: 255 }).notNull(),
-    providerAccountId: varchar("provider_account_id", {
-      length: 255,
-    }).notNull(),
-    refresh_token: text("refresh_token"),
-    access_token: text("access_token"),
-    expires_at: integer("expires_at"),
-    token_type: varchar("token_type", { length: 255 }),
-    scope: varchar("scope", { length: 255 }),
-    id_token: text("id_token"),
-    session_state: varchar("session_state", { length: 255 }),
-  },
-  (account) => ({
-    compoundKey: primaryKey({
-      columns: [account.provider, account.providerAccountId],
-    }),
-    userIdIdx: index("account_user_id_idx").on(account.userId),
-  }),
-);
-
-export const accountsRelations = relations(accounts, ({ one }) => ({
-  user: one(users, { fields: [accounts.userId], references: [users.id] }),
-}));
-
-export const sessions = createTable(
-  "session",
-  {
-    sessionToken: varchar("session_token", { length: 255 })
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    referrerAddress: varchar("referrer_address", { length: 42 })
       .notNull()
-      .primaryKey(),
-    userId: varchar("user_id", { length: 255 })
+      .references(() => leaderboard.walletAddress),
+    refereeAddress: varchar("referee_address", { length: 42 })
       .notNull()
-      .references(() => users.id),
-    expires: timestamp("expires", {
-      mode: "date",
-      withTimezone: true,
-    }).notNull(),
+      .unique(),
+    isFirstGamePlayed: boolean("is_first_game_played").notNull().default(false),
+    referrerRewardGiven: boolean("referrer_reward_given")
+      .notNull()
+      .default(false),
+    refereeRewardGiven: boolean("referee_reward_given")
+      .notNull()
+      .default(false),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .default(sql`CURRENT_TIMESTAMP`),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .default(sql`CURRENT_TIMESTAMP`),
   },
-  (session) => ({
-    userIdIdx: index("session_user_id_idx").on(session.userId),
-  }),
-);
-
-export const sessionsRelations = relations(sessions, ({ one }) => ({
-  user: one(users, { fields: [sessions.userId], references: [users.id] }),
-}));
-
-export const verificationTokens = createTable(
-  "verification_token",
-  {
-    identifier: varchar("identifier", { length: 255 }).notNull(),
-    token: varchar("token", { length: 255 }).notNull(),
-    expires: timestamp("expires", {
-      mode: "date",
-      withTimezone: true,
-    }).notNull(),
-  },
-  (vt) => ({
-    compoundKey: primaryKey({ columns: [vt.identifier, vt.token] }),
+  (table) => ({
+    referrerIdx: index("referral_referrer_idx").on(table.referrerAddress),
+    refereeIdx: index("referral_referee_idx").on(table.refereeAddress),
   }),
 );
 
@@ -115,6 +59,10 @@ export const leaderboard = createTable("leaderboard", {
   highScore: bigint("high_score", { mode: "number" }).notNull(),
   longestSurvival: bigint("longest_survival", { mode: "number" }).notNull(),
   pongTokenCount: bigint("pong_token_count", { mode: "number" }).notNull(),
+  totalReferrals: bigint("total_referrals", { mode: "number" })
+    .notNull()
+    .default(0),
+  hasPlayedFirstGame: boolean("has_played_first_game").notNull().default(false),
   createdAt: timestamp("created_at", { withTimezone: true })
     .notNull()
     .default(sql`CURRENT_TIMESTAMP`),
@@ -122,3 +70,14 @@ export const leaderboard = createTable("leaderboard", {
     .notNull()
     .default(sql`CURRENT_TIMESTAMP`),
 });
+
+export const referralsRelations = relations(referrals, ({ one }) => ({
+  referrer: one(leaderboard, {
+    fields: [referrals.referrerAddress],
+    references: [leaderboard.walletAddress],
+  }),
+}));
+
+export const leaderboardRelations = relations(leaderboard, ({ many }) => ({
+  referrals: many(referrals),
+}));

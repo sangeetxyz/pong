@@ -2,8 +2,10 @@ import { useGameAtom } from "@/atoms/game.atom";
 import { getToken } from "@/lib/action";
 import { calculateScore, getScoreMultiplier } from "@/lib/utils";
 import { clamp } from "lodash-es";
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import { toast } from "sonner";
+import { useReferral } from "@/hooks/useReferral";
+import { useSession } from "next-auth/react";
 
 const createAudio = (src: string): HTMLAudioElement => {
   if (typeof window === "undefined") return {} as HTMLAudioElement;
@@ -12,6 +14,14 @@ const createAudio = (src: string): HTMLAudioElement => {
 
 const useGame = () => {
   const [gameState, setGameState] = useGameAtom();
+  const { processPendingReferral } = useReferral();
+  const { data: session } = useSession();
+
+  useEffect(() => {
+    if (session?.user) {
+      processPendingReferral();
+    }
+  }, [session?.user, processPendingReferral]);
 
   const pong = useCallback(
     (velocity: number) => {
@@ -22,7 +32,6 @@ const useGame = () => {
         console.error(e);
       });
 
-      // Update score if velocity is high enough
       if (velocity > 10) {
         setGameState((prev) => {
           const newCount = prev.count + 1;
@@ -59,12 +68,14 @@ const useGame = () => {
       endTime: Date.now(),
       isLoading: true,
     }));
+
     const res = await getToken({
       score: gameState.score,
       startTime: gameState.startTime,
       endTime: Date.now(),
       count: gameState.count,
     });
+
     handleRes(res);
     setGameState((prev) => ({ ...prev, isLoading: false }));
   }, [setGameState, gameState]);

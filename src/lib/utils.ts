@@ -19,10 +19,12 @@ export const truncateAddress = (address?: string) => {
  */
 export function getScoreMultiplier(count: number): number {
   const MULTIPLIER_GROWTH_RATE = Number(env.NEXT_PUBLIC_MULTIPLIER_GROWTH_RATE);
+  const MAX_MULTIPLIER = Number(env.NEXT_PUBLIC_MAX_MULTIPLIER);
 
   if (count <= 0) return 1;
 
-  return (1 + MULTIPLIER_GROWTH_RATE) ** count;
+  const multiplier = (1 + MULTIPLIER_GROWTH_RATE) ** count;
+  return Math.min(multiplier, MAX_MULTIPLIER);
 }
 
 export function calculateScore(count: number, basePoints = 1) {
