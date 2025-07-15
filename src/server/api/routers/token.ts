@@ -150,7 +150,7 @@ export const tokenRouter = createTRPCRouter({
       });
 
       if (!referrerExists) {
-        return { success: false, message: "Invalid referrer address." };
+        return { success: false, message: undefined };
       }
 
       if (input.referrerAddress === refereeAddress) {
