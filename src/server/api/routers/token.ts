@@ -216,6 +216,10 @@ export const tokenRouter = createTRPCRouter({
       where: eq(referrals.referrerAddress, userAddress),
     });
 
+    const leaderboardEntry = await ctx.db.query.leaderboard.findFirst({
+      where: eq(leaderboard.walletAddress, userAddress),
+    });
+
     const totalReferrals = referralStats.length;
     const successfulReferrals = referralStats.filter(
       (r) => r.isFirstGamePlayed,
@@ -229,6 +233,7 @@ export const tokenRouter = createTRPCRouter({
       successfulReferrals,
       pendingReferrals,
       referralLink: `${env.NEXT_PUBLIC_BASE_URL}?ref=${userAddress}`,
+      canShareReferral: leaderboardEntry?.hasPlayedFirstGame ?? false,
     };
   }),
 

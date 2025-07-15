@@ -20,7 +20,7 @@ const Refer = () => {
     void refetchReferralStats();
   }, [refetchReferralStats, open]);
 
-  if (!referralStats) return null;
+  if (!referralStats || !referralStats.canShareReferral) return null;
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
