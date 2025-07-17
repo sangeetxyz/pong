@@ -105,7 +105,7 @@ const Refer = () => {
             <Button
               onClick={() => {
                 if (referralStats?.canShareReferral) {
-                  shareReferralLink();
+                  void shareReferralLink();
                 } else {
                   setOpen(false);
                 }
