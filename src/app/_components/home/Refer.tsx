@@ -11,6 +11,8 @@ import { useReferral } from "@/hooks/useReferral";
 import { Button } from "../ui/button";
 import { Share2, Gift, Clock, DollarSign } from "lucide-react";
 import Link from "next/link";
+import { cn } from "@/lib/utils";
+import { env } from "@/env";
 
 const Refer = () => {
   const { referralStats, shareReferralLink, refetchReferralStats } =
@@ -21,7 +23,7 @@ const Refer = () => {
     void refetchReferralStats();
   }, [refetchReferralStats, open]);
 
-  if (!referralStats?.canShareReferral) return null;
+  // if (!referralStats?.canShareReferral) return null;
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
@@ -50,13 +52,17 @@ const Refer = () => {
           <div className="mt-8 flex space-x-4">
             <div className="w-full rounded-xl border bg-zinc-900 p-2 text-center">
               <div className="text-2xl font-bold text-blue-600">
-                {referralStats.totalReferrals}
+                {referralStats?.canShareReferral
+                  ? referralStats.totalReferrals
+                  : 0}
               </div>
               <div className="text-xs font-medium text-gray-500">Total</div>
             </div>
             <div className="w-full rounded-xl border bg-zinc-900 p-2 text-center">
               <div className="text-2xl font-bold text-green-600">
-                {referralStats.successfulReferrals}
+                {referralStats?.canShareReferral
+                  ? referralStats.successfulReferrals
+                  : 0}
               </div>
               <div className="text-xs font-medium text-gray-500">
                 Successful
@@ -64,7 +70,9 @@ const Refer = () => {
             </div>
             <div className="w-full rounded-xl border bg-zinc-900 p-2 text-center">
               <div className="text-2xl font-bold text-orange-600">
-                {referralStats.pendingReferrals}
+                {referralStats?.canShareReferral
+                  ? referralStats.pendingReferrals
+                  : 0}
               </div>
               <div className="text-xs font-medium text-gray-500">Pending</div>
             </div>
@@ -75,21 +83,49 @@ const Refer = () => {
               Referral Link
             </div>
             <input
-              className="mt-2 truncate rounded-xl border bg-zinc-900 p-3 text-sm text-zinc-400 focus:outline-none"
-              defaultValue={referralStats.referralLink}
+              className={cn(
+                "mt-2 truncate rounded-xl border bg-zinc-900 p-3 text-sm text-zinc-400 focus:outline-none",
+                {
+                  "cursor-not-allowed text-center":
+                    !referralStats?.canShareReferral,
+                },
+              )}
+              defaultValue={
+                referralStats?.canShareReferral
+                  ? referralStats.referralLink
+                  : "LOCKED"
+              }
             />
+            {!referralStats?.canShareReferral && (
+              <div className="mt-2 text-xs text-red-500">
+                You need to score at least {env.NEXT_PUBLIC_MINIMUM_SCORE}{" "}
+                points to unlock referrals.
+              </div>
+            )}
             <Button
-              onClick={shareReferralLink}
+              onClick={() => {
+                if (referralStats?.canShareReferral) {
+                  shareReferralLink();
+                } else {
+                  setOpen(false);
+                }
+              }}
+              // disabled={!referralStats?.canShareReferral}
               className="mt-4 flex w-full items-center gap-2"
             >
-              <Share2 className="h-4 w-4" />
-              Share Referral Link
+              {referralStats?.canShareReferral && (
+                <Share2 className="h-4 w-4" />
+              )}
+              {referralStats?.canShareReferral
+                ? "Share your Referral Link"
+                : "Unlock by scoring more points"}
             </Button>
             <Link href="https://testnet.huddle01.com" passHref>
               <Button
                 variant={"outline"}
                 onClick={shareReferralLink}
                 className="mt-4 flex w-full items-center gap-2"
+                disabled={!referralStats?.canShareReferral}
               >
                 <DollarSign className="h-4 w-4" />
                 Claim your Points on Huddle01
@@ -115,18 +151,19 @@ const Refer = () => {
             </div>
           </div>
 
-          {referralStats.pendingReferrals > 0 && (
-            <div className="mt-6 rounded-xl border bg-zinc-900 p-3">
-              <div className="mb-1 flex items-center gap-2 font-medium text-orange-700">
-                <Clock className="h-4 w-4" />
-                Pending Referrals
+          {!!referralStats?.pendingReferrals &&
+            referralStats.pendingReferrals > 0 && (
+              <div className="mt-6 rounded-xl border bg-zinc-900 p-3">
+                <div className="mb-1 flex items-center gap-2 font-medium text-orange-700">
+                  <Clock className="h-4 w-4" />
+                  Pending Referrals
+                </div>
+                <div className="text-sm text-orange-600">
+                  {referralStats.pendingReferrals} user(s) signed up but
+                  haven&apos;t played their first game yet.
+                </div>
               </div>
-              <div className="text-sm text-orange-600">
-                {referralStats.pendingReferrals} user(s) signed up but
-                haven&apos;t played their first game yet.
-              </div>
-            </div>
-          )}
+            )}
         </div>
       </SheetContent>
     </Sheet>
