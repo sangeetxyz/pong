@@ -6,6 +6,7 @@ import { ThemeProvider } from "./_components/theme";
 import ReownProvider from "@/lib/web3/provider";
 import { cookies as nextCookies } from "next/headers";
 import { Toaster } from "./_components/ui/sonner";
+import Script from "next/script";
 
 export const viewport: Viewport = {
   themeColor: [{ media: "(prefers-color-scheme: dark)", color: "black" }],
@@ -31,6 +32,9 @@ export default async function RootLayout({
   const cookies = cookieStore.get("cookies")?.value ?? null;
   return (
     <html lang="en" className={`${GeistSans.variable}`}>
+      <head>
+        <Script defer src="https://assets.onedollarstats.com/stonks.js" />
+      </head>
       <body>
         <ReownProvider cookies={cookies}>
           <ThemeProvider attribute="class" forcedTheme="dark">

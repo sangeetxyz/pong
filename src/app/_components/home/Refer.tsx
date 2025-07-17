@@ -9,7 +9,8 @@ import {
 } from "../ui/sheet";
 import { useReferral } from "@/hooks/useReferral";
 import { Button } from "../ui/button";
-import { Share2, Gift, Clock } from "lucide-react";
+import { Share2, Gift, Clock, DollarSign } from "lucide-react";
+import Link from "next/link";
 
 const Refer = () => {
   const { referralStats, shareReferralLink, refetchReferralStats } =
@@ -84,6 +85,16 @@ const Refer = () => {
               <Share2 className="h-4 w-4" />
               Share Referral Link
             </Button>
+            <Link href="https://testnet.huddle01.com" passHref>
+              <Button
+                variant={"outline"}
+                onClick={shareReferralLink}
+                className="mt-4 flex w-full items-center gap-2"
+              >
+                <DollarSign className="h-4 w-4" />
+                Claim your Points on Huddle01
+              </Button>
+            </Link>
           </div>
 
           <div className="my-6 border-t border-dashed" />
