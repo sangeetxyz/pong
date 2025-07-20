@@ -1,17 +1,22 @@
-import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 import { db } from "@/server/db";
 import { leaderboard } from "@/server/db/schema";
 import { eq } from "drizzle-orm";
 
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json().catch(() => null);
+    const rawBody = await req.json().catch(() => null);
 
-    if (
-      !body ||
-      typeof body.address !== "string" ||
-      body.address.length !== 42
-    ) {
+    const isValidBody = (body: unknown): body is { address: string } => {
+      return (
+        typeof body === "object" &&
+        body !== null &&
+        "address" in body &&
+        typeof (body as { address: unknown }).address === "string"
+      );
+    };
+
+    if (!isValidBody(rawBody) || rawBody.address.length !== 42) {
       return NextResponse.json({
         error: {
           code: 1,
@@ -21,8 +26,7 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    const walletAddress = body.address.toLowerCase();
-
+    const walletAddress = rawBody.address.toLowerCase();
     const user = await db.query.leaderboard.findFirst({
       where: eq(leaderboard.walletAddress, walletAddress),
     });
@@ -40,7 +44,6 @@ export async function POST(req: NextRequest) {
     });
   } catch (error) {
     console.error("Check user API error:", error);
-
     return NextResponse.json({
       error: {
         code: 2,

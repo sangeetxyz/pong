@@ -14,6 +14,7 @@ const config = {
     "@typescript-eslint/no-unnecessary-type-assertion": "off",
     "@typescript-eslint/array-type": "off",
     "@typescript-eslint/consistent-type-definitions": "off",
+    "@typescript-eslint/no-unsafe-assignment": "warn",
     "@typescript-eslint/consistent-type-imports": [
       "warn",
       {
