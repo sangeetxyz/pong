@@ -1,7 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { db } from "@/server/db";
 import { leaderboard } from "@/server/db/schema";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 
 export async function POST(req: NextRequest) {
   try {
@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
 
     const walletAddress = rawBody.address.toLowerCase();
     const user = await db.query.leaderboard.findFirst({
-      where: eq(leaderboard.walletAddress, walletAddress),
+      where: sql`LOWER(${leaderboard.walletAddress}) = ${walletAddress.toLowerCase()}`,
     });
 
     const hasPlayed = user?.hasPlayedFirstGame ?? false;
